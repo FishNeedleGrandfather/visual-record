@@ -31,12 +31,31 @@
     .home-link { display: inline-flex; align-items: center; margin-bottom: 18px; padding: 7px 11px; border: 1px solid var(--line); border-radius: 5px; background: #f7faf9; color: #19745e; font-size: 13px; font-weight: 650; text-decoration: none; }
     .home-link:hover, .home-link:focus-visible { border-color: #9fc5b9; background: #eaf4f0; outline: none; }
     @media (max-width: 680px) { main { padding: 22px 14px 50px; } h1 { font-size: 23px; } h2 { font-size: 18px; } }
+
+    html { scroll-behavior: smooth; }
+    .journal-layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); max-width: 1680px; margin: 0 auto; }
+    .journal-sidebar { position: sticky; top: 0; align-self: start; height: 100vh; padding: 30px 16px; border-right: 1px solid var(--line); background: #f7faf9; }
+    .journal-sidebar-title { margin: 0 0 14px; padding: 0 10px; color: var(--muted); font-size: 13px; font-weight: 650; }
+    .journal-sidebar nav { display: grid; gap: 5px; }
+    .journal-sidebar a { display: block; padding: 10px; border-radius: 5px; color: var(--ink); font-size: 14px; text-decoration: none; }
+    .journal-sidebar a:hover, .journal-sidebar a:focus-visible { background: #e7f1ed; color: #19745e; outline: none; }
+    .journal-layout main { width: 100%; min-width: 0; }
+    .journal-layout h1 { scroll-margin-top: 24px; }
+    .journal-layout main > h1 ~ h1 { margin-top: 58px; padding-top: 26px; border-top: 2px solid var(--line); }
+    @media (max-width: 760px) {
+      .journal-layout { display: block; }
+      .journal-sidebar { position: sticky; z-index: 2; height: auto; padding: 8px 12px; border-right: 0; border-bottom: 1px solid var(--line); }
+      .journal-sidebar-title { display: none; }
+      .journal-sidebar nav { display: flex; gap: 6px; overflow-x: auto; }
+      .journal-sidebar a { white-space: nowrap; padding: 6px 10px; }
+      .journal-layout h1 { scroll-margin-top: 68px; }
+    }
   </style>
   <script>window.MathJax = {tex: {inlineMath: [['$', '$'], ['\\(', '\\)']]}, svg: {fontCache: 'global'}};</script>
   <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
-<body><main><a class="home-link" href="https://fishneedlegrandfather.github.io/visual/">← 返回首页</a><h1>训练记录</h1>
-<h2>脚本区别</h2>
+<body><div class="journal-layout"><aside class="journal-sidebar"><p class="journal-sidebar-title">实验目录</p><nav aria-label="实验目录"><a href="#record-section-1">脚本区别</a><a href="#record-section-2">训练结果</a><a href="#record-section-3">消融实验</a><a href="#record-section-4">全角度数据集训练</a><a href="#record-section-5">多变体 V7 comb（序号20）</a><a href="#record-section-6">Loss 曲线</a></nav></aside><main><a class="home-link" href="https://fishneedlegrandfather.github.io/visual/">← 返回首页</a><h1>训练记录</h1>
+<h2 id="record-section-1">脚本区别</h2>
 <div class="table-scroll"><table>
 <thead>
 <tr>
@@ -123,7 +142,7 @@
 </tr>
 </tbody>
 </table></div>
-<h2>训练结果</h2>
+<h2 id="record-section-2">训练结果</h2>
 <h3>二个 Case 训练</h3>
 <div class="table-scroll"><table>
 <thead>
@@ -471,103 +490,7 @@
 </table></div>
 <p>本次运行中，序号11的平均验证相对误差比序号9高约0.44个百分点，训练相对误差高约3.94个百分点。Case2、case5验证误差降低，其余三个case升高；eta 归一化后的 MSE 数值更低，不等于物理电流相对误差更低。</p>
 <p>序号12的五个case训练与验证相对误差均低于序号9、11。平均验证误差降为29.00%，比序号9低10.94个百分点（相对降低27.39%），比序号11低11.38个百分点（相对降低28.17%）。这是V7整体方案的改善，尚不能将收益单独归因于入射源支路或几何支路。</p>
-<h3>全角度数据集训练</h3>
-<p>序号17-19使用 <code>trainV7AllAngle.py</code>、<code>MG_num=4</code> 和 <code>dataset_case1to5_allangle_eta.pt</code>；序号17、19从先前的 V7 参数初始化，序号18随机初始化。五个 case 各有171个训练角度和24个验证角度，总计855个训练样本、120个验证样本；计划每5个样本更新一次。与上面的18角度数据集不同，本节 MSE 不宜直接作为同一验证集上的改进量比较。红叉表示训练循环存在梯度未按批次清零的问题，结果不用于判断模型能力。</p>
-<div class="table-scroll"><table>
-<thead>
-<tr>
-<th style="text-align: right;">序号</th>
-<th>初始化</th>
-<th style="text-align: right;">计划Epoch</th>
-<th style="text-align: right;">已完成Epoch</th>
-<th style="text-align: right;">最佳Epoch</th>
-<th style="text-align: right;">train PO baseline</th>
-<th style="text-align: right;">最佳轮train loss</th>
-<th style="text-align: right;">val PO baseline</th>
-<th style="text-align: right;">最佳val loss</th>
-<th style="text-align: right;">末轮train/val loss</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align: right;">17 <span style="color:#d1242f;font-weight:bold">✘</span></td>
-<td>加载 V7 参数</td>
-<td style="text-align: right;">1000</td>
-<td style="text-align: right;">301</td>
-<td style="text-align: right;">173</td>
-<td style="text-align: right;">0.1953250</td>
-<td style="text-align: right;">0.1953198</td>
-<td style="text-align: right;">0.1903792</td>
-<td style="text-align: right;">0.1903693</td>
-<td style="text-align: right;">0.1953179 / 0.1903699</td>
-</tr>
-<tr>
-<td style="text-align: right;">18 <span style="color:#d1242f;font-weight:bold">✘</span></td>
-<td>随机初始化</td>
-<td style="text-align: right;">1000</td>
-<td style="text-align: right;">31</td>
-<td style="text-align: right;">19</td>
-<td style="text-align: right;">0.1953250</td>
-<td style="text-align: right;">0.1953201</td>
-<td style="text-align: right;">0.1903792</td>
-<td style="text-align: right;">0.1903682</td>
-<td style="text-align: right;">0.1953198 / 0.1903695</td>
-</tr>
-<tr>
-<td style="text-align: right;">19</td>
-<td>加载 V7 参数；修正梯度清零</td>
-<td style="text-align: right;">1000</td>
-<td style="text-align: right;">464</td>
-<td style="text-align: right;">204</td>
-<td style="text-align: right;">0.1953249</td>
-<td style="text-align: right;">0.001554014</td>
-<td style="text-align: right;">0.1903792</td>
-<td style="text-align: right;">0.01475297</td>
-<td style="text-align: right;">0.001094989 / 0.01486498</td>
-</tr>
-</tbody>
-</table></div>
-<p>序号17第2轮 train loss 曾升至 <code>1.066473e+06</code>；序号18首轮 train loss 达 <code>2.154771e+05</code>。两次训练均在每个 epoch 开头清零梯度，但每5个样本执行 <code>optimizer.step()</code> 后没有清零，后续批次重复累积了旧梯度，因此此前贴近 PO 基线的结果无效。序号19修正后，最佳验证 loss 在第204轮达到 <code>0.01475297</code>，比验证集 PO 基线 <code>0.1903792</code> 低约92.25%；第204轮之后到日志截止的第464轮没有再刷新最佳值，训练 loss 继续下降而验证 loss 基本持平。表中最佳轮 train loss 是当轮训练日志值，末轮 loss 不是最佳 checkpoint 的复算值；本实验尚未计算电流相对误差。</p>
-<h2>多变体 V7comb（新增）</h2>
-<p><code>trainV7A.py</code> 从全角度 V7 checkpoint 初始化，在 <code>datasetXVXA.pt</code> 的 3420 个样本训练；<code>datasetVVVA.pt</code> 与 <code>datasetVVCA.pt</code> 各 270 个样本合并为 540 个验证样本，并用于选择最佳参数。最佳文件为 <code>checkpoints/case1_1ghz_bestV7_eta_comb.pt</code>，第 100 轮，训练修正量 MSE <strong>0.004052070</strong>，验证修正量 MSE <strong>0.038437246</strong>。<code>loss_historyV7_eta_comb.npy</code> 包含 100 轮的训练/验证 loss，最低验证 loss 出现在第 100 轮。</p>
-<p>使用该 checkpoint、<code>MG_num=4</code>，在上述 540 个验证样本上纯推理复算。每个样本按完整六维复电流计算 $\|J_{\rm pred}-J_{\rm MoM}\|_F/\|J_{\rm MoM}\|_F$，先求样本误差，再取平均；PO 基线同口径。归一化修正量 MSE 是 $\operatorname{mean}[(\Delta_{\rm pred}-Y)^2]$。结果如下：</p>
-<div class="table-scroll"><table>
-<thead>
-<tr>
-<th>分组</th>
-<th style="text-align: right;">样本数</th>
-<th style="text-align: right;">PO 相对误差</th>
-<th style="text-align: right;">预测相对误差</th>
-<th style="text-align: right;">修正量 MSE</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>VVVA（验证几何、V 角度）</td>
-<td style="text-align: right;">270</td>
-<td style="text-align: right;">72.04%</td>
-<td style="text-align: right;">30.18%</td>
-<td style="text-align: right;">0.038463847</td>
-</tr>
-<tr>
-<td>VVCA（验证几何、C 角度）</td>
-<td style="text-align: right;">270</td>
-<td style="text-align: right;">71.86%</td>
-<td style="text-align: right;">30.20%</td>
-<td style="text-align: right;">0.038410645</td>
-</tr>
-<tr>
-<td>合并验证集</td>
-<td style="text-align: right;">540</td>
-<td style="text-align: right;"><strong>71.95%</strong></td>
-<td style="text-align: right;"><strong>30.19%</strong></td>
-<td style="text-align: right;"><strong>0.038437246</strong></td>
-</tr>
-</tbody>
-</table></div>
-<p>两组各有五个 case、每 case 54 个样本，因此合并样本平均与五个 case 等权平均相同。<code>VVCA</code> 已进入训练时的验证选择，不能视为独立测试集。当前没有复算 3420 个训练样本的电流相对误差；训练 loss 是 checkpoint 保存的训练日志值。复算的详细分 case 结果见 <code>checkpoints/v7comb_error.json</code>。</p>
-<p>同一 V7comb checkpoint 在独立的 SLICY 几何上纯推理：$\theta=45^\circ$、$\phi=0^\circ:10^\circ:180^\circ$ 共 19 个方向，每方向 74,762 个三角元。逐方向复电流相对误差平均：PO <strong>65.03%</strong>、预测 <strong>53.12%</strong>；归一化修正量 MSE <strong>0.09888287</strong>。这是新几何的泛化观察；页面电流颜色为 $\|\operatorname{Re}J\|_2$，RCS 是三角元电流远场积分估算，不是 FEKO 原生远场。</p>
-<h2>消融实验</h2>
+<h2 id="record-section-3">消融实验</h2>
 <p>序号13、14使用 <code>ablation_study.py</code>，均加载序号12的 <code>case1_1ghz_bestV7_4_eta.pt</code>，<code>MG_num=4</code>，使用同一 eta 数据集和相同的 train/val 角度划分。只关闭指定支路后前向评测一遍，没有重新训练、微调或更新参数。表内使用与前文相同的复电流相对L2 error，单位为百分比，按 <code>train / val</code> 展示，越低越好。每个角度先计算error，再分别对各case的训练/验证角度取平均，最后对5个case等权平均。</p>
 <div class="table-scroll"><table>
 <thead>
@@ -647,7 +570,133 @@
 </table></div>
 <p>结果文件：序号13为 <code>checkpoints/ablation_study/source1_geo0_MG4_eta_error.json</code>，序号14为 <code>checkpoints/ablation_study/source0_geo1_MG4_eta_error.json</code>。这两组反映已训练V7对支路的依赖，不等同于关闭支路后重新训练的结果。</p>
 <p>序号15、16沿用序号12的 checkpoint、eta 数据集、<code>MG_num=4</code> 和相同误差口径；source 与 geo 支路均开启，只在每次 MGTransformer 调用中分别关闭 G1/G2 的一条交流支路，不重新训练。两条支路都从各层原始输入计算，关闭 BiasTransformerBlock 时保留原始特征及 CoupleExchange。结果文件分别为 <code>checkpoints/ablation_study/bias0_cplx1_MG4_eta_error.json</code> 和 <code>checkpoints/ablation_study/bias1_cplx0_MG4_eta_error.json</code>。相对序号12的平均验证误差 29.00%，两组分别升至 80.49% 和 69.94%；这只能说明已训练的 V7 权重对两条支路都敏感。关闭任一支路后若重新初始化或微调，其误差能否重新降低、降低到什么程度，尚未测试，不能根据本表断言该支路在可重新训练的网络中不可缺少。</p>
-<h2>Loss 曲线</h2>
+<h2 id="record-section-4">全角度数据集训练</h2>
+<p>序号17-19使用 <code>trainV7AllAngle.py</code>、<code>MG_num=4</code> 和 <code>dataset_case1to5_allangle_eta.pt</code>；序号17、19从先前的 V7 参数初始化，序号18随机初始化。五个 case 各有171个训练角度和24个验证角度，总计855个训练样本、120个验证样本；计划每5个样本更新一次。与上面的18角度数据集不同，本节 MSE 不宜直接作为同一验证集上的改进量比较。红叉表示训练循环存在梯度未按批次清零的问题，结果不用于判断模型能力。</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th style="text-align: right;">序号</th>
+<th>初始化</th>
+<th style="text-align: right;">计划Epoch</th>
+<th style="text-align: right;">已完成Epoch</th>
+<th style="text-align: right;">最佳Epoch</th>
+<th style="text-align: right;">train PO baseline</th>
+<th style="text-align: right;">最佳轮train loss</th>
+<th style="text-align: right;">val PO baseline</th>
+<th style="text-align: right;">最佳val loss</th>
+<th style="text-align: right;">末轮train/val loss</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">17 <span style="color:#d1242f;font-weight:bold">✘</span></td>
+<td>加载 V7 参数</td>
+<td style="text-align: right;">1000</td>
+<td style="text-align: right;">301</td>
+<td style="text-align: right;">173</td>
+<td style="text-align: right;">0.1953250</td>
+<td style="text-align: right;">0.1953198</td>
+<td style="text-align: right;">0.1903792</td>
+<td style="text-align: right;">0.1903693</td>
+<td style="text-align: right;">0.1953179 / 0.1903699</td>
+</tr>
+<tr>
+<td style="text-align: right;">18 <span style="color:#d1242f;font-weight:bold">✘</span></td>
+<td>随机初始化</td>
+<td style="text-align: right;">1000</td>
+<td style="text-align: right;">31</td>
+<td style="text-align: right;">19</td>
+<td style="text-align: right;">0.1953250</td>
+<td style="text-align: right;">0.1953201</td>
+<td style="text-align: right;">0.1903792</td>
+<td style="text-align: right;">0.1903682</td>
+<td style="text-align: right;">0.1953198 / 0.1903695</td>
+</tr>
+<tr>
+<td style="text-align: right;">19</td>
+<td>加载 V7 参数；修正梯度清零</td>
+<td style="text-align: right;">1000</td>
+<td style="text-align: right;">464</td>
+<td style="text-align: right;">204</td>
+<td style="text-align: right;">0.1953249</td>
+<td style="text-align: right;">0.001554014</td>
+<td style="text-align: right;">0.1903792</td>
+<td style="text-align: right;">0.01475297</td>
+<td style="text-align: right;">0.001094989 / 0.01486498</td>
+</tr>
+</tbody>
+</table></div>
+<p>序号17第2轮 train loss 曾升至 <code>1.066473e+06</code>；序号18首轮 train loss 达 <code>2.154771e+05</code>。两次训练均在每个 epoch 开头清零梯度，但每5个样本执行 <code>optimizer.step()</code> 后没有清零，后续批次重复累积了旧梯度，因此此前贴近 PO 基线的结果无效。序号19修正后，最佳验证 loss 在第204轮达到 <code>0.01475297</code>，比验证集 PO 基线 <code>0.1903792</code> 低约92.25%；第204轮之后到日志截止的第464轮没有再刷新最佳值，训练 loss 继续下降而验证 loss 基本持平。表中最佳轮 train loss 是当轮训练日志值，末轮 loss 不是最佳 checkpoint 的复算值；本实验尚未计算电流相对误差。</p>
+<h2 id="record-section-5">多变体 V7 comb（序号20）</h2>
+<p><code>trainV7A.py</code> 从全角度 V7 checkpoint 初始化，在 <code>datasetXVXA.pt</code> 的 3420 个样本训练；<code>datasetVVVA.pt</code> 与 <code>datasetVVCA.pt</code> 各 270 个样本合并为 540 个验证样本，并用于选择最佳参数。最佳文件为 <code>checkpoints/case1_1ghz_bestV7_eta_comb.pt</code>，第 100 轮，训练修正量 MSE <strong>0.004052070</strong>，验证修正量 MSE <strong>0.038437246</strong>。<code>loss_historyV7_eta_comb.npy</code> 包含 100 轮的训练/验证 loss，最低验证 loss 出现在第 100 轮。</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th style="text-align: right;">序号</th>
+<th>脚本</th>
+<th style="text-align: right;">MG_num</th>
+<th>初始化</th>
+<th>训练集</th>
+<th>验证集</th>
+<th style="text-align: right;">Epoch</th>
+<th style="text-align: right;">最佳Epoch</th>
+<th style="text-align: right;">最佳轮train loss</th>
+<th style="text-align: right;">最佳val loss</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">20</td>
+<td><code>trainV7A.py</code></td>
+<td style="text-align: right;">4</td>
+<td>全角度 V7 checkpoint</td>
+<td>XVXA，3420 个样本</td>
+<td>VVVA + VVCA，540 个样本</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: right;">0.004052070</td>
+<td style="text-align: right;">0.038437246</td>
+</tr>
+</tbody>
+</table></div>
+<p>使用该 checkpoint、<code>MG_num=4</code>，在上述 540 个验证样本上纯推理复算。每个样本按完整六维复电流计算 $\|J_{\rm pred}-J_{\rm MoM}\|_F/\|J_{\rm MoM}\|_F$，先求样本误差，再取平均；PO 基线同口径。归一化修正量 MSE 是 $\operatorname{mean}[(\Delta_{\rm pred}-Y)^2]$。结果如下：</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>分组</th>
+<th style="text-align: right;">样本数</th>
+<th style="text-align: right;">PO 相对误差</th>
+<th style="text-align: right;">预测相对误差</th>
+<th style="text-align: right;">修正量 MSE</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>VVVA（验证几何、V 角度）</td>
+<td style="text-align: right;">270</td>
+<td style="text-align: right;">72.04%</td>
+<td style="text-align: right;">30.18%</td>
+<td style="text-align: right;">0.038463847</td>
+</tr>
+<tr>
+<td>VVCA（验证几何、C 角度）</td>
+<td style="text-align: right;">270</td>
+<td style="text-align: right;">71.86%</td>
+<td style="text-align: right;">30.20%</td>
+<td style="text-align: right;">0.038410645</td>
+</tr>
+<tr>
+<td>合并验证集</td>
+<td style="text-align: right;">540</td>
+<td style="text-align: right;"><strong>71.95%</strong></td>
+<td style="text-align: right;"><strong>30.19%</strong></td>
+<td style="text-align: right;"><strong>0.038437246</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>两组各有五个 case、每 case 54 个样本，因此合并样本平均与五个 case 等权平均相同。<code>VVCA</code> 已进入训练时的验证选择，不能视为独立测试集。当前没有复算 3420 个训练样本的电流相对误差；训练 loss 是 checkpoint 保存的训练日志值。复算的详细分 case 结果见 <code>checkpoints/v7comb_error.json</code>。</p>
+<p>同一 V7comb checkpoint 在独立的 SLICY 几何上纯推理：$\theta=45^\circ$、$\phi=0^\circ:10^\circ:180^\circ$ 共 19 个方向，每方向 74,762 个三角元。逐方向复电流相对误差平均：PO <strong>65.03%</strong>、预测 <strong>53.12%</strong>；归一化修正量 MSE <strong>0.09888287</strong>。这是新几何的泛化观察；页面电流颜色为 $\|\operatorname{Re}J\|_2$，RCS 是三角元电流远场积分估算，不是 FEKO 原生远场。</p>
+<h2 id="record-section-6">Loss 曲线</h2>
 <h3>序号7</h3>
 <p>
 <img alt="序号7 Case 1 loss曲线" src="assets/loss_curves/experiment_7_case1.png" width="32%"/>
@@ -683,5 +732,10 @@
 <p>
 <img alt="序号19全角度V7训练和验证loss曲线；右图放大第100轮后的验证loss" src="assets/loss_curves/experiment_19_average.png" width="90%"/>
 </p>
-<p>曲线取自工作站日志第1-464轮；逐轮数据保存在 <code>record_assets/loss_curves/experiment_19_history.csv</code>。最佳验证 loss 出现在第204轮。</p></main></body>
+<p>曲线取自工作站日志第1-464轮；逐轮数据保存在 <code>record_assets/loss_curves/experiment_19_history.csv</code>。最佳验证 loss 出现在第204轮。</p>
+<h3>序号20</h3>
+<p>
+<img alt="序号20多变体V7 comb训练和验证loss曲线；最佳验证loss在第100轮" src="assets/loss_curves/experiment_20_average.png" width="90%"/>
+</p>
+<p>曲线取自 <code>checkpoints/loss_historyV7_eta_comb.npy</code> 的100轮训练记录；训练集为 XVXA，验证集为 VVVA 与 VVCA 的合并数据。第100轮训练修正量 MSE 为 <code>0.004052070</code>，验证修正量 MSE 为 <code>0.038437246</code>，也是最低验证 loss。</p></main></div></body>
 </html>
