@@ -54,7 +54,7 @@
   <script>window.MathJax = {tex: {inlineMath: [['$', '$'], ['\\(', '\\)']]}, svg: {fontCache: 'global'}};</script>
   <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
-<body><div class="journal-layout"><aside class="journal-sidebar"><p class="journal-sidebar-title">实验目录</p><nav aria-label="实验目录"><a href="#record-section-1">脚本区别</a><a href="#record-section-2">训练结果</a><a href="#record-section-3">消融实验</a><a href="#record-section-4">全角度数据集训练</a><a href="#record-section-5">多变体 V7 comb（序号20）</a><a href="#record-section-6">Loss 曲线</a></nav></aside><main><a class="home-link" href="https://fishneedlegrandfather.github.io/visual/">← 返回首页</a><h1>训练记录</h1>
+<body><div class="journal-layout"><aside class="journal-sidebar"><p class="journal-sidebar-title">实验目录</p><nav aria-label="实验目录"><a href="#record-section-1">脚本区别</a><a href="#record-section-2">训练结果</a><a href="#record-section-3">消融实验</a><a href="#record-section-4">全角度数据集训练</a><a href="#record-section-5">多变体 V7 comb（序号20）</a><a href="#record-section-6">SLICY addTrain 验证（序号21）</a><a href="#record-section-7">Loss 曲线</a></nav></aside><main><a class="home-link" href="https://fishneedlegrandfather.github.io/visual/">← 返回首页</a><h1>训练记录</h1>
 <h2 id="record-section-1">脚本区别</h2>
 <div class="table-scroll"><table>
 <thead>
@@ -701,7 +701,164 @@
 <p><img alt="SLICY 单站 RCS 完整对比" src="assets/weekly_journal/monostatic_slicy_comb.png"/></p>
 <p><strong>重点对比：去除 PO 后比较 MoM、V7comb 预测与 FEKO 二次反射。</strong></p>
 <p><img alt="SLICY 单站 RCS 去除 PO 后的对比" src="assets/weekly_journal/monostatic_slicy_comb_no_po.png"/></p>
-<h2 id="record-section-6">Loss 曲线</h2>
+<h2 id="record-section-6">SLICY addTrain 验证（序号21）</h2>
+<p><code>trainV7addTrain.py</code> 以五个旧 CAD 族各一个训练变体和 <code>LayerCircle</code>、<code>LayerCylinder</code>、<code>ThreeAngle</code> 三个新几何组成的 <code>case_addTrain/dataset_transfer_8geom_theta45.pt</code>（8 几何 × 19 方向，共 152 样本）继续训练；<code>caseSLICY/dataset_SLICY.pt</code> 的 19 个方向用于验证并选择最佳参数。因此下表是 <strong>SLICY 验证表现，不是未接触的最终测试</strong>。最佳 checkpoint 为 <code>checkpoints/case1_1ghz_bestV7_eta_addTrain.pt</code>（第 18 轮）；其保存的 train / val 归一化修正量 MSE 为 <code>0.009177404 / 0.048993025</code>。本地用该权重及 <code>MG_num=4</code> 重新推理得到的 SLICY 逐方向平均修正量 MSE 为 <code>0.048993023</code>，与 checkpoint 验证 loss 的差异是浮点精度所致。</p>
+<p>下表使用同一份 SLICY 数据：$\theta=45^\circ$、$\phi=0^\circ:10^\circ:180^\circ$。每个方向的误差为完整六维复电流的 $\|J-J_{\rm MoM}\|_F/\|J_{\rm MoM}\|_F\times100\%$，PO 列以 $J=J_{\rm PO}$ 计算；V7comb 和 addTrain 列分别使用两份最佳权重。每行先算相对误差，末行再对 19 行等权平均。降低量为 V7comb 减 addTrain 的<strong>百分点</strong>，越大表示改善越多。</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th style="text-align: right;">$\phi$</th>
+<th style="text-align: right;">PO error</th>
+<th style="text-align: right;">V7comb 预测 error</th>
+<th style="text-align: right;">addTrain 预测 error</th>
+<th style="text-align: right;">预测误差降低（百分点）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">0°</td>
+<td style="text-align: right;">63.73%</td>
+<td style="text-align: right;">56.20%</td>
+<td style="text-align: right;">38.13%</td>
+<td style="text-align: right;">18.07</td>
+</tr>
+<tr>
+<td style="text-align: right;">10°</td>
+<td style="text-align: right;">63.76%</td>
+<td style="text-align: right;">54.79%</td>
+<td style="text-align: right;">36.71%</td>
+<td style="text-align: right;">18.08</td>
+</tr>
+<tr>
+<td style="text-align: right;">20°</td>
+<td style="text-align: right;">64.33%</td>
+<td style="text-align: right;">54.76%</td>
+<td style="text-align: right;">37.20%</td>
+<td style="text-align: right;">17.56</td>
+</tr>
+<tr>
+<td style="text-align: right;">30°</td>
+<td style="text-align: right;">65.19%</td>
+<td style="text-align: right;">55.07%</td>
+<td style="text-align: right;">37.11%</td>
+<td style="text-align: right;">17.96</td>
+</tr>
+<tr>
+<td style="text-align: right;">40°</td>
+<td style="text-align: right;">66.19%</td>
+<td style="text-align: right;">54.92%</td>
+<td style="text-align: right;">37.27%</td>
+<td style="text-align: right;">17.65</td>
+</tr>
+<tr>
+<td style="text-align: right;">50°</td>
+<td style="text-align: right;">65.77%</td>
+<td style="text-align: right;">52.97%</td>
+<td style="text-align: right;">37.52%</td>
+<td style="text-align: right;">15.45</td>
+</tr>
+<tr>
+<td style="text-align: right;">60°</td>
+<td style="text-align: right;">65.41%</td>
+<td style="text-align: right;">51.78%</td>
+<td style="text-align: right;">36.28%</td>
+<td style="text-align: right;">15.50</td>
+</tr>
+<tr>
+<td style="text-align: right;">70°</td>
+<td style="text-align: right;">65.10%</td>
+<td style="text-align: right;">51.38%</td>
+<td style="text-align: right;">35.81%</td>
+<td style="text-align: right;">15.57</td>
+</tr>
+<tr>
+<td style="text-align: right;">80°</td>
+<td style="text-align: right;">65.55%</td>
+<td style="text-align: right;">51.98%</td>
+<td style="text-align: right;">37.42%</td>
+<td style="text-align: right;">14.56</td>
+</tr>
+<tr>
+<td style="text-align: right;">90°</td>
+<td style="text-align: right;">67.01%</td>
+<td style="text-align: right;">51.83%</td>
+<td style="text-align: right;">39.12%</td>
+<td style="text-align: right;">12.71</td>
+</tr>
+<tr>
+<td style="text-align: right;">100°</td>
+<td style="text-align: right;">65.73%</td>
+<td style="text-align: right;">50.98%</td>
+<td style="text-align: right;">37.14%</td>
+<td style="text-align: right;">13.84</td>
+</tr>
+<tr>
+<td style="text-align: right;">110°</td>
+<td style="text-align: right;">64.68%</td>
+<td style="text-align: right;">49.62%</td>
+<td style="text-align: right;">34.60%</td>
+<td style="text-align: right;">15.02</td>
+</tr>
+<tr>
+<td style="text-align: right;">120°</td>
+<td style="text-align: right;">65.32%</td>
+<td style="text-align: right;">50.71%</td>
+<td style="text-align: right;">36.76%</td>
+<td style="text-align: right;">13.95</td>
+</tr>
+<tr>
+<td style="text-align: right;">130°</td>
+<td style="text-align: right;">65.90%</td>
+<td style="text-align: right;">52.26%</td>
+<td style="text-align: right;">36.73%</td>
+<td style="text-align: right;">15.53</td>
+</tr>
+<tr>
+<td style="text-align: right;">140°</td>
+<td style="text-align: right;">65.60%</td>
+<td style="text-align: right;">53.25%</td>
+<td style="text-align: right;">37.97%</td>
+<td style="text-align: right;">15.28</td>
+</tr>
+<tr>
+<td style="text-align: right;">150°</td>
+<td style="text-align: right;">65.01%</td>
+<td style="text-align: right;">53.19%</td>
+<td style="text-align: right;">39.01%</td>
+<td style="text-align: right;">14.19</td>
+</tr>
+<tr>
+<td style="text-align: right;">160°</td>
+<td style="text-align: right;">63.99%</td>
+<td style="text-align: right;">53.69%</td>
+<td style="text-align: right;">38.17%</td>
+<td style="text-align: right;">15.52</td>
+</tr>
+<tr>
+<td style="text-align: right;">170°</td>
+<td style="text-align: right;">63.51%</td>
+<td style="text-align: right;">54.81%</td>
+<td style="text-align: right;">38.07%</td>
+<td style="text-align: right;">16.74</td>
+</tr>
+<tr>
+<td style="text-align: right;">180°</td>
+<td style="text-align: right;">63.80%</td>
+<td style="text-align: right;">55.12%</td>
+<td style="text-align: right;">38.66%</td>
+<td style="text-align: right;">16.46</td>
+</tr>
+<tr>
+<td style="text-align: right;"><strong>逐方向均值</strong></td>
+<td style="text-align: right;"><strong>65.03%</strong></td>
+<td style="text-align: right;"><strong>53.12%</strong></td>
+<td style="text-align: right;"><strong>37.35%</strong></td>
+<td style="text-align: right;"><strong>15.77</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>PO 列在两次评估中逐方向相同；改变 checkpoint 不改变 PO 基线。addTrain 在 19 个方向的复电流误差均低于 V7comb；逐点结果和计算来源见 <code>visualization/slicy_comb/summary.json</code> 与 <code>visualization/slicy_addTrain_validation/summary.json</code>。同口径单站 RCS dBsm RMSE（相对 MoM）为 PO <strong>17.21 dB</strong>、V7comb 预测 <strong>3.82 dB</strong>、addTrain 预测 <strong>4.02 dB</strong>；电流误差改善并未使该 RCS 指标同步改善。两者的 PO/MoM/预测 RCS 都是三角元电流远场积分估算。</p>
+<h2 id="record-section-7">Loss 曲线</h2>
 <h3>序号7</h3>
 <p>
 <img alt="序号7 Case 1 loss曲线" src="assets/loss_curves/experiment_7_case1.png" width="32%"/>
