@@ -702,7 +702,7 @@
 <p><strong>重点对比：去除 PO 后比较 MoM、V7comb 预测与 FEKO 二次反射。</strong></p>
 <p><img alt="SLICY 单站 RCS 去除 PO 后的对比" src="assets/weekly_journal/monostatic_slicy_comb_no_po.png"/></p>
 <h2 id="record-section-6">SLICY addTrain 验证（序号21）</h2>
-<p><code>trainV7addTrain.py</code> 以五个旧 CAD 族各一个训练变体和 <code>LayerCircle</code>、<code>LayerCylinder</code>、<code>ThreeAngle</code> 三个新几何组成的 <code>case_addTrain/dataset_transfer_8geom_theta45.pt</code>（8 几何 × 19 方向，共 152 样本）继续训练；<code>caseSLICY/dataset_SLICY.pt</code> 的 19 个方向用于验证并选择最佳参数。因此下表是 <strong>SLICY 验证表现，不是未接触的最终测试</strong>。最佳 checkpoint 为 <code>checkpoints/case1_1ghz_bestV7_eta_addTrain.pt</code>（第 18 轮）；其保存的 train / val 归一化修正量 MSE 为 <code>0.009177404 / 0.048993025</code>。本地用该权重及 <code>MG_num=4</code> 重新推理得到的 SLICY 逐方向平均修正量 MSE 为 <code>0.048993023</code>，与 checkpoint 验证 loss 的差异是浮点精度所致。</p>
+<p><code>trainV7addTrain.py</code> 以五个旧 CAD 族各一个训练变体和 <code>LayerCircle</code>、<code>LayerCylinder</code>、<code>ThreeAngle</code> 三个新几何组成的 <code>case_addTrain/dataset_transfer_8geom_theta45.pt</code>（8 几何 × 19 方向，共 152 样本）进行迁移训练；<code>caseSLICY/dataset_SLICY.pt</code> 的 19 个方向用于验证并选择最佳参数。最佳 checkpoint 为 <code>checkpoints/case1_1ghz_bestV7_eta_addTrain.pt</code>（第 18 轮）；其保存的 train / val 归一化修正量 MSE 为 <code>0.009177404 / 0.048993025</code>。本地用该权重及 <code>MG_num=4</code> 重新推理得到的 SLICY 逐方向平均修正量 MSE 为 <code>0.048993023</code>，与 checkpoint 验证 loss 的差异是浮点精度所致。</p>
 <p>下表使用同一份 SLICY 数据：$\theta=45^\circ$、$\phi=0^\circ:10^\circ:180^\circ$。每个方向的误差为完整六维复电流的 $\|J-J_{\rm MoM}\|_F/\|J_{\rm MoM}\|_F\times100\%$，PO 列以 $J=J_{\rm PO}$ 计算；V7comb 和 addTrain 列分别使用两份最佳权重。每行先算相对误差，末行再对 19 行等权平均。降低量为 V7comb 减 addTrain 的<strong>百分点</strong>，越大表示改善越多。</p>
 <div class="table-scroll"><table>
 <thead>
