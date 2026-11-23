@@ -54,7 +54,7 @@
   <script>window.MathJax = {tex: {inlineMath: [['$', '$'], ['\\(', '\\)']]}, svg: {fontCache: 'global'}};</script>
   <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
-<body><div class="journal-layout"><aside class="journal-sidebar"><p class="journal-sidebar-title">实验目录</p><nav aria-label="实验目录"><a href="#record-section-1">脚本区别</a><a href="#record-section-2">训练结果</a><a href="#record-section-3">消融实验</a><a href="#record-section-4">全角度数据集训练</a><a href="#record-section-5">多变体 V7 comb（序号20）</a><a href="#record-section-6">SLICY addTrain 验证（序号21）</a><a href="#record-section-7">Loss 曲线</a></nav></aside><main><a class="home-link" href="https://fishneedlegrandfather.github.io/visual/">← 返回首页</a><h1>训练记录</h1>
+<body><div class="journal-layout"><aside class="journal-sidebar"><p class="journal-sidebar-title">实验目录</p><nav aria-label="实验目录"><a href="#record-section-1">脚本区别</a><a href="#record-section-2">训练结果</a><a href="#record-section-3">消融实验</a><a href="#record-section-4">全角度数据集训练</a><a href="#record-section-5">多变体 V7 comb（序号20）</a><a href="#record-section-6">SLICY addTrain 验证（序号21）</a><a href="#record-section-7">caseOther 未见几何泛化（序号22）</a><a href="#record-section-8">Loss 曲线</a></nav></aside><main><a class="home-link" href="https://fishneedlegrandfather.github.io/visual/">← 返回首页</a><h1>训练记录</h1>
 <h2 id="record-section-1">脚本区别</h2>
 <div class="table-scroll"><table>
 <thead>
@@ -858,7 +858,1524 @@
 </tbody>
 </table></div>
 <p>PO 列在两次评估中逐方向相同；改变 checkpoint 不改变 PO 基线。addTrain 在 19 个方向的复电流误差均低于 V7comb；逐点结果和计算来源见 <code>visualization/slicy_comb/summary.json</code> 与 <code>visualization/slicy_addTrain_validation/summary.json</code>。同口径单站 RCS dBsm RMSE（相对 MoM）为 PO <strong>17.21 dB</strong>、V7comb 预测 <strong>3.82 dB</strong>、addTrain 预测 <strong>4.02 dB</strong>；电流误差改善并未使该 RCS 指标同步改善。两者的 PO/MoM/预测 RCS 都是三角元电流远场积分估算。</p>
-<h2 id="record-section-7">Loss 曲线</h2>
+<h2 id="record-section-7">caseOther 未见几何泛化（序号22）</h2>
+<p><code>caseOther</code> 目前包含 9 个独立目标：CombFlare、Satellite2、Satellite3、Satellite4、SatelliteCylinder、SatelliteSphere、PlaneF22、TrihedralAngle、Rocket。各目标均为 1 GHz、同一固定极化、统一 $\eta_0$ 归一化，使用 $\theta=45^\circ$、$\phi=0^\circ:10^\circ:180^\circ$ 的 19 个 MoM/PO 配对方向。它们未参与 V7comb 或 addTrain 的训练与验证选模；以下是新几何泛化观察，不是先验封存的最终测试。Satellite2 是原 <code>caseOther/satellite</code> 目录改名后的同一几何；PlaneF22 使用当前约 2.45 m 长的缩比网格，不能解释为实际尺寸 F-22。各目标网格、方向、电流归一化与 checkpoint 信息以各自数据集、归档文件和评估 <code>summary.json</code> 为准。</p>
+<p>两份模型分别为 <code>checkpoints/case1_1ghz_bestV7_eta_comb.pt</code>（V7comb，第 100 轮，<code>trainV7A.py</code>）和 <code>checkpoints/case1_1ghz_bestV7_eta_addTrain.pt</code>（addTrain，第 18 轮，<code>trainV7addTrain.py</code>），均用 <code>MG_num=4</code> 纯推理。评估入口为 <code>caseSLICY/export_slicy_visualization.py</code>；本节没有重新训练，也没有新的训练 loss 曲线。每个方向的<strong>完整复电流相对误差</strong>为 $\|J-J_{\rm MoM}\|_F/\|J_{\rm MoM}\|_F\times100\%$，下表电流指标是 19 个方向的等权平均；RCS 列是同 19 个方向的 dBsm 差值 RMSE，以 MoM 曲线为参照。RCS 全部由三角元复电流积分估算，<strong>不是 FEKO 原生远场</strong>。两份评估的 PO/MoM 基线已逐点核对一致。下表数值越低越好，RCS 单位为 dB。</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>目标</th>
+<th style="text-align: right;">三角元</th>
+<th style="text-align: right;">PO 电流误差</th>
+<th style="text-align: right;">V7comb 电流误差</th>
+<th style="text-align: right;">addTrain 电流误差</th>
+<th style="text-align: right;">PO RCS RMSE</th>
+<th style="text-align: right;">V7comb RCS RMSE</th>
+<th style="text-align: right;">addTrain RCS RMSE</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CombFlare</td>
+<td style="text-align: right;">25,022</td>
+<td style="text-align: right;">65.78%</td>
+<td style="text-align: right;">47.80%</td>
+<td style="text-align: right;">42.22%</td>
+<td style="text-align: right;">12.98</td>
+<td style="text-align: right;">2.77</td>
+<td style="text-align: right;">3.30</td>
+</tr>
+<tr>
+<td>Satellite2</td>
+<td style="text-align: right;">41,756</td>
+<td style="text-align: right;">57.14%</td>
+<td style="text-align: right;">51.99%</td>
+<td style="text-align: right;">47.12%</td>
+<td style="text-align: right;">11.61</td>
+<td style="text-align: right;">8.16</td>
+<td style="text-align: right;">6.81</td>
+</tr>
+<tr>
+<td>Satellite3</td>
+<td style="text-align: right;">36,764</td>
+<td style="text-align: right;">65.98%</td>
+<td style="text-align: right;">56.61%</td>
+<td style="text-align: right;">48.83%</td>
+<td style="text-align: right;">17.07</td>
+<td style="text-align: right;">4.49</td>
+<td style="text-align: right;">3.54</td>
+</tr>
+<tr>
+<td>Satellite4</td>
+<td style="text-align: right;">48,576</td>
+<td style="text-align: right;">62.71%</td>
+<td style="text-align: right;">54.09%</td>
+<td style="text-align: right;">43.25%</td>
+<td style="text-align: right;">24.47</td>
+<td style="text-align: right;">5.91</td>
+<td style="text-align: right;">2.71</td>
+</tr>
+<tr>
+<td>PlaneF22</td>
+<td style="text-align: right;">11,870</td>
+<td style="text-align: right;">68.99%</td>
+<td style="text-align: right;">63.60%</td>
+<td style="text-align: right;">61.88%</td>
+<td style="text-align: right;">8.30</td>
+<td style="text-align: right;">5.36</td>
+<td style="text-align: right;">6.89</td>
+</tr>
+<tr>
+<td>TrihedralAngle</td>
+<td style="text-align: right;">19,356</td>
+<td style="text-align: right;">71.27%</td>
+<td style="text-align: right;">40.14%</td>
+<td style="text-align: right;">36.05%</td>
+<td style="text-align: right;">26.04</td>
+<td style="text-align: right;">7.53</td>
+<td style="text-align: right;">7.84</td>
+</tr>
+<tr>
+<td>Rocket</td>
+<td style="text-align: right;">40,506</td>
+<td style="text-align: right;">60.06%</td>
+<td style="text-align: right;">54.21%</td>
+<td style="text-align: right;">49.71%</td>
+<td style="text-align: right;">8.81</td>
+<td style="text-align: right;">6.81</td>
+<td style="text-align: right;">4.98</td>
+</tr>
+<tr>
+<td>SatelliteCylinder</td>
+<td style="text-align: right;">51,390</td>
+<td style="text-align: right;">55.36%</td>
+<td style="text-align: right;">56.11%</td>
+<td style="text-align: right;">44.25%</td>
+<td style="text-align: right;">11.72</td>
+<td style="text-align: right;">6.14</td>
+<td style="text-align: right;">4.41</td>
+</tr>
+<tr>
+<td>SatelliteSphere</td>
+<td style="text-align: right;">89,502</td>
+<td style="text-align: right;">52.66%</td>
+<td style="text-align: right;">57.28%</td>
+<td style="text-align: right;">49.31%</td>
+<td style="text-align: right;">2.42</td>
+<td style="text-align: right;">4.75</td>
+<td style="text-align: right;">3.41</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>分类口径：</strong>“较好结果”指两份模型在这组方向的平均电流误差和 RCS RMSE 均低于 PO；“较坏结果”指至少一份模型的总体指标高于 PO。分类只描述此批 19 方向的观察，不代表对所有入射方向或目标尺寸的保证。部分“较好”目标仍有个别方向退化，下文保留这些负例。</p>
+<h3>较好结果</h3>
+<h4>CombFlare 未见几何泛化对比</h4>
+<p><code>caseOther/CombFlare/dataset_CombFlare.pt</code> 是 1 GHz、统一 $\eta_0$ 归一化的配对 PO/MoM 数据：25,022 个三角元，$\theta=45^\circ$、$\phi=0^\circ:10^\circ:180^\circ$ 共 19 个方向。CombFlare 没有进入 V7comb 或 addTrain 的训练与验证选模，数据集在两份 checkpoint 之后完成；这里是同一未见几何上的纯推理对照。V7comb 使用 <code>checkpoints/case1_1ghz_bestV7_eta_comb.pt</code>（第 100 轮），addTrain 使用 <code>checkpoints/case1_1ghz_bestV7_eta_addTrain.pt</code>（第 18 轮），均为 <code>MG_num=4</code>。下表沿用上面的完整复电流相对 L2 定义；末行先逐方向计算、再对 19 个方向等权平均。降低量是 V7comb 减 addTrain，单位为<strong>百分点</strong>。</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th style="text-align: right;">$\phi$</th>
+<th style="text-align: right;">PO error</th>
+<th style="text-align: right;">V7comb 预测 error</th>
+<th style="text-align: right;">addTrain 预测 error</th>
+<th style="text-align: right;">预测误差降低（百分点）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">0°</td>
+<td style="text-align: right;">69.09%</td>
+<td style="text-align: right;">53.02%</td>
+<td style="text-align: right;">45.14%</td>
+<td style="text-align: right;">7.88</td>
+</tr>
+<tr>
+<td style="text-align: right;">10°</td>
+<td style="text-align: right;">65.61%</td>
+<td style="text-align: right;">52.64%</td>
+<td style="text-align: right;">44.39%</td>
+<td style="text-align: right;">8.25</td>
+</tr>
+<tr>
+<td style="text-align: right;">20°</td>
+<td style="text-align: right;">64.79%</td>
+<td style="text-align: right;">52.68%</td>
+<td style="text-align: right;">45.23%</td>
+<td style="text-align: right;">7.45</td>
+</tr>
+<tr>
+<td style="text-align: right;">30°</td>
+<td style="text-align: right;">64.02%</td>
+<td style="text-align: right;">50.32%</td>
+<td style="text-align: right;">45.14%</td>
+<td style="text-align: right;">5.18</td>
+</tr>
+<tr>
+<td style="text-align: right;">40°</td>
+<td style="text-align: right;">65.17%</td>
+<td style="text-align: right;">46.98%</td>
+<td style="text-align: right;">43.04%</td>
+<td style="text-align: right;">3.94</td>
+</tr>
+<tr>
+<td style="text-align: right;">50°</td>
+<td style="text-align: right;">66.60%</td>
+<td style="text-align: right;">45.56%</td>
+<td style="text-align: right;">41.01%</td>
+<td style="text-align: right;">4.56</td>
+</tr>
+<tr>
+<td style="text-align: right;">60°</td>
+<td style="text-align: right;">66.06%</td>
+<td style="text-align: right;">43.54%</td>
+<td style="text-align: right;">39.36%</td>
+<td style="text-align: right;">4.18</td>
+</tr>
+<tr>
+<td style="text-align: right;">70°</td>
+<td style="text-align: right;">65.48%</td>
+<td style="text-align: right;">42.89%</td>
+<td style="text-align: right;">39.06%</td>
+<td style="text-align: right;">3.83</td>
+</tr>
+<tr>
+<td style="text-align: right;">80°</td>
+<td style="text-align: right;">65.07%</td>
+<td style="text-align: right;">42.94%</td>
+<td style="text-align: right;">39.22%</td>
+<td style="text-align: right;">3.72</td>
+</tr>
+<tr>
+<td style="text-align: right;">90°</td>
+<td style="text-align: right;">65.34%</td>
+<td style="text-align: right;">42.36%</td>
+<td style="text-align: right;">39.18%</td>
+<td style="text-align: right;">3.18</td>
+</tr>
+<tr>
+<td style="text-align: right;">100°</td>
+<td style="text-align: right;">64.92%</td>
+<td style="text-align: right;">42.26%</td>
+<td style="text-align: right;">38.75%</td>
+<td style="text-align: right;">3.51</td>
+</tr>
+<tr>
+<td style="text-align: right;">110°</td>
+<td style="text-align: right;">65.14%</td>
+<td style="text-align: right;">42.85%</td>
+<td style="text-align: right;">38.17%</td>
+<td style="text-align: right;">4.67</td>
+</tr>
+<tr>
+<td style="text-align: right;">120°</td>
+<td style="text-align: right;">66.22%</td>
+<td style="text-align: right;">45.33%</td>
+<td style="text-align: right;">39.86%</td>
+<td style="text-align: right;">5.47</td>
+</tr>
+<tr>
+<td style="text-align: right;">130°</td>
+<td style="text-align: right;">66.17%</td>
+<td style="text-align: right;">46.53%</td>
+<td style="text-align: right;">41.09%</td>
+<td style="text-align: right;">5.45</td>
+</tr>
+<tr>
+<td style="text-align: right;">140°</td>
+<td style="text-align: right;">65.63%</td>
+<td style="text-align: right;">47.96%</td>
+<td style="text-align: right;">43.62%</td>
+<td style="text-align: right;">4.34</td>
+</tr>
+<tr>
+<td style="text-align: right;">150°</td>
+<td style="text-align: right;">63.86%</td>
+<td style="text-align: right;">50.31%</td>
+<td style="text-align: right;">45.59%</td>
+<td style="text-align: right;">4.72</td>
+</tr>
+<tr>
+<td style="text-align: right;">160°</td>
+<td style="text-align: right;">65.10%</td>
+<td style="text-align: right;">51.96%</td>
+<td style="text-align: right;">43.96%</td>
+<td style="text-align: right;">8.00</td>
+</tr>
+<tr>
+<td style="text-align: right;">170°</td>
+<td style="text-align: right;">65.73%</td>
+<td style="text-align: right;">53.18%</td>
+<td style="text-align: right;">44.11%</td>
+<td style="text-align: right;">9.07</td>
+</tr>
+<tr>
+<td style="text-align: right;">180°</td>
+<td style="text-align: right;">69.81%</td>
+<td style="text-align: right;">54.96%</td>
+<td style="text-align: right;">46.27%</td>
+<td style="text-align: right;">8.69</td>
+</tr>
+<tr>
+<td style="text-align: right;"><strong>逐方向均值</strong></td>
+<td style="text-align: right;"><strong>65.78%</strong></td>
+<td style="text-align: right;"><strong>47.80%</strong></td>
+<td style="text-align: right;"><strong>42.22%</strong></td>
+<td style="text-align: right;"><strong>5.58</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>addTrain 的复电流相对误差在 CombFlare 的 <strong>19/19</strong> 个方向均低于 V7comb，平均降低 <strong>5.58 个百分点</strong>；结合 SLICY 验证集上平均降低 <strong>15.77 个百分点</strong>，这两个几何的电流指标都支持 addTrain 的改善。一个<strong>可能的解释</strong>是 V7comb 更贴合原有训练几何分布，面对新结构时出现过度适配；在原 checkpoint 上加入 <code>LayerCircle</code>、<code>LayerCylinder</code>、<code>ThreeAngle</code> 三种新几何后，仅用最佳第 18 轮的短程继续训练，就改善了 CombFlare 这一未见几何的复电流预测。不过，这不是过拟合机制的直接证明：新增几何改变了训练分布，且 SLICY 被用于 addTrain 选模，不能将收益单独归因于训练轮数少或原权重过拟合；仍需更多预先封存的新几何验证泛化结论。</p>
+<p>同一 19 方向、同一三角元复电流远场积分口径下，以 MoM 为参照的单站 RCS dBsm RMSE 为 PO <strong>12.98 dB</strong>、V7comb <strong>2.77 dB</strong>、addTrain <strong>3.30 dB</strong>。因此 addTrain 虽然在完整复电流误差上更好，RCS RMSE 在此几何上反而比 V7comb 高约 <strong>0.525 dB</strong>（由未四舍五入值相减）；综合“更好”应限定为以复电流误差为主的评价。逐点来源分别为 <code>visualization/combflare_v7comb_generalization/summary.json</code> 与 <code>visualization/combflare_addTrain_generalization/summary.json</code>；两次评估的 PO/MoM 基线逐点一致。</p>
+<h4>Satellite2</h4>
+<p>数据集：<code>caseOther/Satellite2/dataset_satellite.pt</code>，41,756 个三角元。这是原 <code>satellite</code> 目录改名后的目标，评估输出仍沿用 <code>satellite</code> 文件名前缀。下表每行是完整复电流相对 MoM 的误差；降低量为 V7comb 减 addTrain，单位为百分点。</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th style="text-align: right;">$\phi$</th>
+<th style="text-align: right;">PO error</th>
+<th style="text-align: right;">V7comb 预测 error</th>
+<th style="text-align: right;">addTrain 预测 error</th>
+<th style="text-align: right;">预测误差降低（百分点）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">0°</td>
+<td style="text-align: right;">50.84%</td>
+<td style="text-align: right;">41.52%</td>
+<td style="text-align: right;">36.93%</td>
+<td style="text-align: right;">4.59</td>
+</tr>
+<tr>
+<td style="text-align: right;">10°</td>
+<td style="text-align: right;">50.23%</td>
+<td style="text-align: right;">42.43%</td>
+<td style="text-align: right;">37.77%</td>
+<td style="text-align: right;">4.66</td>
+</tr>
+<tr>
+<td style="text-align: right;">20°</td>
+<td style="text-align: right;">50.69%</td>
+<td style="text-align: right;">45.04%</td>
+<td style="text-align: right;">39.95%</td>
+<td style="text-align: right;">5.09</td>
+</tr>
+<tr>
+<td style="text-align: right;">30°</td>
+<td style="text-align: right;">52.80%</td>
+<td style="text-align: right;">47.73%</td>
+<td style="text-align: right;">42.72%</td>
+<td style="text-align: right;">5.01</td>
+</tr>
+<tr>
+<td style="text-align: right;">40°</td>
+<td style="text-align: right;">56.67%</td>
+<td style="text-align: right;">51.30%</td>
+<td style="text-align: right;">46.35%</td>
+<td style="text-align: right;">4.95</td>
+</tr>
+<tr>
+<td style="text-align: right;">50°</td>
+<td style="text-align: right;">58.97%</td>
+<td style="text-align: right;">54.42%</td>
+<td style="text-align: right;">49.38%</td>
+<td style="text-align: right;">5.04</td>
+</tr>
+<tr>
+<td style="text-align: right;">60°</td>
+<td style="text-align: right;">61.48%</td>
+<td style="text-align: right;">57.52%</td>
+<td style="text-align: right;">51.87%</td>
+<td style="text-align: right;">5.65</td>
+</tr>
+<tr>
+<td style="text-align: right;">70°</td>
+<td style="text-align: right;">63.45%</td>
+<td style="text-align: right;">60.21%</td>
+<td style="text-align: right;">54.53%</td>
+<td style="text-align: right;">5.68</td>
+</tr>
+<tr>
+<td style="text-align: right;">80°</td>
+<td style="text-align: right;">64.81%</td>
+<td style="text-align: right;">61.10%</td>
+<td style="text-align: right;">56.03%</td>
+<td style="text-align: right;">5.07</td>
+</tr>
+<tr>
+<td style="text-align: right;">90°</td>
+<td style="text-align: right;">65.87%</td>
+<td style="text-align: right;">60.89%</td>
+<td style="text-align: right;">56.52%</td>
+<td style="text-align: right;">4.38</td>
+</tr>
+<tr>
+<td style="text-align: right;">100°</td>
+<td style="text-align: right;">64.85%</td>
+<td style="text-align: right;">60.42%</td>
+<td style="text-align: right;">56.00%</td>
+<td style="text-align: right;">4.42</td>
+</tr>
+<tr>
+<td style="text-align: right;">110°</td>
+<td style="text-align: right;">63.49%</td>
+<td style="text-align: right;">59.76%</td>
+<td style="text-align: right;">55.10%</td>
+<td style="text-align: right;">4.65</td>
+</tr>
+<tr>
+<td style="text-align: right;">120°</td>
+<td style="text-align: right;">61.45%</td>
+<td style="text-align: right;">57.22%</td>
+<td style="text-align: right;">53.48%</td>
+<td style="text-align: right;">3.74</td>
+</tr>
+<tr>
+<td style="text-align: right;">130°</td>
+<td style="text-align: right;">58.91%</td>
+<td style="text-align: right;">53.92%</td>
+<td style="text-align: right;">50.59%</td>
+<td style="text-align: right;">3.33</td>
+</tr>
+<tr>
+<td style="text-align: right;">140°</td>
+<td style="text-align: right;">56.74%</td>
+<td style="text-align: right;">51.96%</td>
+<td style="text-align: right;">48.26%</td>
+<td style="text-align: right;">3.70</td>
+</tr>
+<tr>
+<td style="text-align: right;">150°</td>
+<td style="text-align: right;">52.80%</td>
+<td style="text-align: right;">46.97%</td>
+<td style="text-align: right;">43.71%</td>
+<td style="text-align: right;">3.27</td>
+</tr>
+<tr>
+<td style="text-align: right;">160°</td>
+<td style="text-align: right;">50.62%</td>
+<td style="text-align: right;">45.70%</td>
+<td style="text-align: right;">40.38%</td>
+<td style="text-align: right;">5.32</td>
+</tr>
+<tr>
+<td style="text-align: right;">170°</td>
+<td style="text-align: right;">50.23%</td>
+<td style="text-align: right;">45.02%</td>
+<td style="text-align: right;">38.60%</td>
+<td style="text-align: right;">6.42</td>
+</tr>
+<tr>
+<td style="text-align: right;">180°</td>
+<td style="text-align: right;">50.85%</td>
+<td style="text-align: right;">44.74%</td>
+<td style="text-align: right;">37.09%</td>
+<td style="text-align: right;">7.65</td>
+</tr>
+<tr>
+<td style="text-align: right;"><strong>逐方向均值</strong></td>
+<td style="text-align: right;"><strong>57.14%</strong></td>
+<td style="text-align: right;"><strong>51.99%</strong></td>
+<td style="text-align: right;"><strong>47.12%</strong></td>
+<td style="text-align: right;"><strong>4.88</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>addTrain 的电流误差在 <strong>19/19</strong> 个方向低于 V7comb。归一化修正量 MSE 的 19 方向均值：V7comb <strong>0.085245</strong>、addTrain <strong>0.070440</strong>；它与物理电流相对误差不是同一指标。同口径单站 RCS RMSE：PO <strong>11.61 dB</strong>、V7comb <strong>8.16 dB</strong>、addTrain <strong>6.81 dB</strong>。addTrain 的 RCS 单点绝对误差在 12/19 个方向低于 V7comb；整体 RMSE 需按平方差汇总，不能由方向胜出数决定。逐点数据与本地页面分别见 <code>visualization/satellite_v7comb_generalization/summary.json</code>、<code>visualization/satellite_addTrain_generalization/summary.json</code> 及各目录的 <code>index.html</code>。</p>
+<h4>Satellite3</h4>
+<p>数据集：<code>caseOther/Satellite3/dataset_Satellite3.pt</code>，36,764 个三角元。下表每行是完整复电流相对 MoM 的误差；降低量为 V7comb 减 addTrain，单位为百分点。</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th style="text-align: right;">$\phi$</th>
+<th style="text-align: right;">PO error</th>
+<th style="text-align: right;">V7comb 预测 error</th>
+<th style="text-align: right;">addTrain 预测 error</th>
+<th style="text-align: right;">预测误差降低（百分点）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">0°</td>
+<td style="text-align: right;">65.32%</td>
+<td style="text-align: right;">58.81%</td>
+<td style="text-align: right;">53.90%</td>
+<td style="text-align: right;">4.92</td>
+</tr>
+<tr>
+<td style="text-align: right;">10°</td>
+<td style="text-align: right;">65.15%</td>
+<td style="text-align: right;">57.92%</td>
+<td style="text-align: right;">52.87%</td>
+<td style="text-align: right;">5.05</td>
+</tr>
+<tr>
+<td style="text-align: right;">20°</td>
+<td style="text-align: right;">65.52%</td>
+<td style="text-align: right;">56.98%</td>
+<td style="text-align: right;">51.52%</td>
+<td style="text-align: right;">5.46</td>
+</tr>
+<tr>
+<td style="text-align: right;">30°</td>
+<td style="text-align: right;">66.60%</td>
+<td style="text-align: right;">56.00%</td>
+<td style="text-align: right;">48.15%</td>
+<td style="text-align: right;">7.85</td>
+</tr>
+<tr>
+<td style="text-align: right;">40°</td>
+<td style="text-align: right;">66.49%</td>
+<td style="text-align: right;">54.52%</td>
+<td style="text-align: right;">44.59%</td>
+<td style="text-align: right;">9.94</td>
+</tr>
+<tr>
+<td style="text-align: right;">50°</td>
+<td style="text-align: right;">66.39%</td>
+<td style="text-align: right;">53.75%</td>
+<td style="text-align: right;">43.39%</td>
+<td style="text-align: right;">10.35</td>
+</tr>
+<tr>
+<td style="text-align: right;">60°</td>
+<td style="text-align: right;">66.44%</td>
+<td style="text-align: right;">53.94%</td>
+<td style="text-align: right;">43.78%</td>
+<td style="text-align: right;">10.16</td>
+</tr>
+<tr>
+<td style="text-align: right;">70°</td>
+<td style="text-align: right;">66.37%</td>
+<td style="text-align: right;">53.42%</td>
+<td style="text-align: right;">44.11%</td>
+<td style="text-align: right;">9.32</td>
+</tr>
+<tr>
+<td style="text-align: right;">80°</td>
+<td style="text-align: right;">66.47%</td>
+<td style="text-align: right;">54.57%</td>
+<td style="text-align: right;">45.05%</td>
+<td style="text-align: right;">9.52</td>
+</tr>
+<tr>
+<td style="text-align: right;">90°</td>
+<td style="text-align: right;">66.66%</td>
+<td style="text-align: right;">56.75%</td>
+<td style="text-align: right;">48.66%</td>
+<td style="text-align: right;">8.10</td>
+</tr>
+<tr>
+<td style="text-align: right;">100°</td>
+<td style="text-align: right;">65.41%</td>
+<td style="text-align: right;">57.28%</td>
+<td style="text-align: right;">51.47%</td>
+<td style="text-align: right;">5.81</td>
+</tr>
+<tr>
+<td style="text-align: right;">110°</td>
+<td style="text-align: right;">65.04%</td>
+<td style="text-align: right;">57.86%</td>
+<td style="text-align: right;">52.95%</td>
+<td style="text-align: right;">4.91</td>
+</tr>
+<tr>
+<td style="text-align: right;">120°</td>
+<td style="text-align: right;">65.26%</td>
+<td style="text-align: right;">58.88%</td>
+<td style="text-align: right;">53.93%</td>
+<td style="text-align: right;">4.96</td>
+</tr>
+<tr>
+<td style="text-align: right;">130°</td>
+<td style="text-align: right;">65.03%</td>
+<td style="text-align: right;">58.42%</td>
+<td style="text-align: right;">52.68%</td>
+<td style="text-align: right;">5.75</td>
+</tr>
+<tr>
+<td style="text-align: right;">140°</td>
+<td style="text-align: right;">65.41%</td>
+<td style="text-align: right;">58.06%</td>
+<td style="text-align: right;">51.15%</td>
+<td style="text-align: right;">6.91</td>
+</tr>
+<tr>
+<td style="text-align: right;">150°</td>
+<td style="text-align: right;">66.71%</td>
+<td style="text-align: right;">57.58%</td>
+<td style="text-align: right;">49.08%</td>
+<td style="text-align: right;">8.51</td>
+</tr>
+<tr>
+<td style="text-align: right;">160°</td>
+<td style="text-align: right;">66.52%</td>
+<td style="text-align: right;">57.03%</td>
+<td style="text-align: right;">47.70%</td>
+<td style="text-align: right;">9.34</td>
+</tr>
+<tr>
+<td style="text-align: right;">170°</td>
+<td style="text-align: right;">66.41%</td>
+<td style="text-align: right;">56.93%</td>
+<td style="text-align: right;">46.40%</td>
+<td style="text-align: right;">10.53</td>
+</tr>
+<tr>
+<td style="text-align: right;">180°</td>
+<td style="text-align: right;">66.43%</td>
+<td style="text-align: right;">56.78%</td>
+<td style="text-align: right;">46.35%</td>
+<td style="text-align: right;">10.43</td>
+</tr>
+<tr>
+<td style="text-align: right;"><strong>逐方向均值</strong></td>
+<td style="text-align: right;"><strong>65.98%</strong></td>
+<td style="text-align: right;"><strong>56.61%</strong></td>
+<td style="text-align: right;"><strong>48.83%</strong></td>
+<td style="text-align: right;"><strong>7.78</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>addTrain 的电流误差在 <strong>19/19</strong> 个方向低于 V7comb。归一化修正量 MSE 的 19 方向均值：V7comb <strong>0.118843</strong>、addTrain <strong>0.087953</strong>；它与物理电流相对误差不是同一指标。同口径单站 RCS RMSE：PO <strong>17.07 dB</strong>、V7comb <strong>4.49 dB</strong>、addTrain <strong>3.54 dB</strong>。addTrain 的 RCS 单点绝对误差在 10/19 个方向低于 V7comb；整体 RMSE 需按平方差汇总，不能由方向胜出数决定。逐点数据与本地页面分别见 <code>visualization/satellite3_v7comb_generalization/summary.json</code>、<code>visualization/satellite3_addTrain_generalization/summary.json</code> 及各目录的 <code>index.html</code>。</p>
+<h4>Satellite4</h4>
+<p>数据集：<code>caseOther/Satellite4/dataset_Satellite4.pt</code>，48,576 个三角元。下表每行是完整复电流相对 MoM 的误差；降低量为 V7comb 减 addTrain，单位为百分点。</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th style="text-align: right;">$\phi$</th>
+<th style="text-align: right;">PO error</th>
+<th style="text-align: right;">V7comb 预测 error</th>
+<th style="text-align: right;">addTrain 预测 error</th>
+<th style="text-align: right;">预测误差降低（百分点）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">0°</td>
+<td style="text-align: right;">62.66%</td>
+<td style="text-align: right;">52.79%</td>
+<td style="text-align: right;">39.16%</td>
+<td style="text-align: right;">13.63</td>
+</tr>
+<tr>
+<td style="text-align: right;">10°</td>
+<td style="text-align: right;">62.65%</td>
+<td style="text-align: right;">53.24%</td>
+<td style="text-align: right;">41.04%</td>
+<td style="text-align: right;">12.20</td>
+</tr>
+<tr>
+<td style="text-align: right;">20°</td>
+<td style="text-align: right;">62.97%</td>
+<td style="text-align: right;">54.63%</td>
+<td style="text-align: right;">44.34%</td>
+<td style="text-align: right;">10.29</td>
+</tr>
+<tr>
+<td style="text-align: right;">30°</td>
+<td style="text-align: right;">62.84%</td>
+<td style="text-align: right;">55.20%</td>
+<td style="text-align: right;">46.34%</td>
+<td style="text-align: right;">8.86</td>
+</tr>
+<tr>
+<td style="text-align: right;">40°</td>
+<td style="text-align: right;">62.85%</td>
+<td style="text-align: right;">56.56%</td>
+<td style="text-align: right;">48.27%</td>
+<td style="text-align: right;">8.29</td>
+</tr>
+<tr>
+<td style="text-align: right;">50°</td>
+<td style="text-align: right;">62.83%</td>
+<td style="text-align: right;">56.47%</td>
+<td style="text-align: right;">48.81%</td>
+<td style="text-align: right;">7.66</td>
+</tr>
+<tr>
+<td style="text-align: right;">60°</td>
+<td style="text-align: right;">62.74%</td>
+<td style="text-align: right;">54.95%</td>
+<td style="text-align: right;">44.66%</td>
+<td style="text-align: right;">10.29</td>
+</tr>
+<tr>
+<td style="text-align: right;">70°</td>
+<td style="text-align: right;">62.76%</td>
+<td style="text-align: right;">54.06%</td>
+<td style="text-align: right;">41.94%</td>
+<td style="text-align: right;">12.12</td>
+</tr>
+<tr>
+<td style="text-align: right;">80°</td>
+<td style="text-align: right;">62.46%</td>
+<td style="text-align: right;">52.97%</td>
+<td style="text-align: right;">39.24%</td>
+<td style="text-align: right;">13.74</td>
+</tr>
+<tr>
+<td style="text-align: right;">90°</td>
+<td style="text-align: right;">62.52%</td>
+<td style="text-align: right;">51.73%</td>
+<td style="text-align: right;">37.68%</td>
+<td style="text-align: right;">14.05</td>
+</tr>
+<tr>
+<td style="text-align: right;">100°</td>
+<td style="text-align: right;">62.46%</td>
+<td style="text-align: right;">52.04%</td>
+<td style="text-align: right;">38.62%</td>
+<td style="text-align: right;">13.42</td>
+</tr>
+<tr>
+<td style="text-align: right;">110°</td>
+<td style="text-align: right;">62.80%</td>
+<td style="text-align: right;">52.92%</td>
+<td style="text-align: right;">41.32%</td>
+<td style="text-align: right;">11.60</td>
+</tr>
+<tr>
+<td style="text-align: right;">120°</td>
+<td style="text-align: right;">62.65%</td>
+<td style="text-align: right;">54.36%</td>
+<td style="text-align: right;">44.65%</td>
+<td style="text-align: right;">9.71</td>
+</tr>
+<tr>
+<td style="text-align: right;">130°</td>
+<td style="text-align: right;">62.79%</td>
+<td style="text-align: right;">55.50%</td>
+<td style="text-align: right;">48.83%</td>
+<td style="text-align: right;">6.67</td>
+</tr>
+<tr>
+<td style="text-align: right;">140°</td>
+<td style="text-align: right;">62.74%</td>
+<td style="text-align: right;">55.91%</td>
+<td style="text-align: right;">48.59%</td>
+<td style="text-align: right;">7.32</td>
+</tr>
+<tr>
+<td style="text-align: right;">150°</td>
+<td style="text-align: right;">62.79%</td>
+<td style="text-align: right;">54.90%</td>
+<td style="text-align: right;">45.91%</td>
+<td style="text-align: right;">8.99</td>
+</tr>
+<tr>
+<td style="text-align: right;">160°</td>
+<td style="text-align: right;">62.88%</td>
+<td style="text-align: right;">53.75%</td>
+<td style="text-align: right;">43.31%</td>
+<td style="text-align: right;">10.44</td>
+</tr>
+<tr>
+<td style="text-align: right;">170°</td>
+<td style="text-align: right;">62.51%</td>
+<td style="text-align: right;">52.72%</td>
+<td style="text-align: right;">40.00%</td>
+<td style="text-align: right;">12.72</td>
+</tr>
+<tr>
+<td style="text-align: right;">180°</td>
+<td style="text-align: right;">62.59%</td>
+<td style="text-align: right;">52.99%</td>
+<td style="text-align: right;">39.07%</td>
+<td style="text-align: right;">13.92</td>
+</tr>
+<tr>
+<td style="text-align: right;"><strong>逐方向均值</strong></td>
+<td style="text-align: right;"><strong>62.71%</strong></td>
+<td style="text-align: right;"><strong>54.09%</strong></td>
+<td style="text-align: right;"><strong>43.25%</strong></td>
+<td style="text-align: right;"><strong>10.84</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>addTrain 的电流误差在 <strong>19/19</strong> 个方向低于 V7comb。归一化修正量 MSE 的 19 方向均值：V7comb <strong>0.106240</strong>、addTrain <strong>0.068396</strong>；它与物理电流相对误差不是同一指标。同口径单站 RCS RMSE：PO <strong>24.47 dB</strong>、V7comb <strong>5.91 dB</strong>、addTrain <strong>2.71 dB</strong>。addTrain 的 RCS 单点绝对误差在 15/19 个方向低于 V7comb；整体 RMSE 需按平方差汇总，不能由方向胜出数决定。逐点数据与本地页面分别见 <code>visualization/satellite4_v7comb_generalization/summary.json</code>、<code>visualization/satellite4_addTrain_generalization/summary.json</code> 及各目录的 <code>index.html</code>。</p>
+<h4>PlaneF22</h4>
+<p>数据集：<code>caseOther/PlaneF22/dataset_F22.pt</code>，11,870 个三角元。当前网格约 2.45 m 长，是缩比 F22，不代表实际尺寸飞机。下表每行是完整复电流相对 MoM 的误差；降低量为 V7comb 减 addTrain，单位为百分点。</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th style="text-align: right;">$\phi$</th>
+<th style="text-align: right;">PO error</th>
+<th style="text-align: right;">V7comb 预测 error</th>
+<th style="text-align: right;">addTrain 预测 error</th>
+<th style="text-align: right;">预测误差降低（百分点）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">0°</td>
+<td style="text-align: right;">69.47%</td>
+<td style="text-align: right;">67.88%</td>
+<td style="text-align: right;">64.76%</td>
+<td style="text-align: right;">3.12</td>
+</tr>
+<tr>
+<td style="text-align: right;">10°</td>
+<td style="text-align: right;">70.65%</td>
+<td style="text-align: right;">67.69%</td>
+<td style="text-align: right;">64.81%</td>
+<td style="text-align: right;">2.88</td>
+</tr>
+<tr>
+<td style="text-align: right;">20°</td>
+<td style="text-align: right;">70.90%</td>
+<td style="text-align: right;">65.32%</td>
+<td style="text-align: right;">63.43%</td>
+<td style="text-align: right;">1.89</td>
+</tr>
+<tr>
+<td style="text-align: right;">30°</td>
+<td style="text-align: right;">71.22%</td>
+<td style="text-align: right;">64.86%</td>
+<td style="text-align: right;">63.48%</td>
+<td style="text-align: right;">1.38</td>
+</tr>
+<tr>
+<td style="text-align: right;">40°</td>
+<td style="text-align: right;">71.26%</td>
+<td style="text-align: right;">65.29%</td>
+<td style="text-align: right;">63.84%</td>
+<td style="text-align: right;">1.45</td>
+</tr>
+<tr>
+<td style="text-align: right;">50°</td>
+<td style="text-align: right;">69.24%</td>
+<td style="text-align: right;">62.61%</td>
+<td style="text-align: right;">61.08%</td>
+<td style="text-align: right;">1.53</td>
+</tr>
+<tr>
+<td style="text-align: right;">60°</td>
+<td style="text-align: right;">69.16%</td>
+<td style="text-align: right;">62.85%</td>
+<td style="text-align: right;">61.50%</td>
+<td style="text-align: right;">1.35</td>
+</tr>
+<tr>
+<td style="text-align: right;">70°</td>
+<td style="text-align: right;">67.90%</td>
+<td style="text-align: right;">61.36%</td>
+<td style="text-align: right;">60.20%</td>
+<td style="text-align: right;">1.16</td>
+</tr>
+<tr>
+<td style="text-align: right;">80°</td>
+<td style="text-align: right;">66.59%</td>
+<td style="text-align: right;">60.08%</td>
+<td style="text-align: right;">59.82%</td>
+<td style="text-align: right;">0.26</td>
+</tr>
+<tr>
+<td style="text-align: right;">90°</td>
+<td style="text-align: right;">66.14%</td>
+<td style="text-align: right;">60.10%</td>
+<td style="text-align: right;">59.20%</td>
+<td style="text-align: right;">0.90</td>
+</tr>
+<tr>
+<td style="text-align: right;">100°</td>
+<td style="text-align: right;">65.59%</td>
+<td style="text-align: right;">58.38%</td>
+<td style="text-align: right;">57.96%</td>
+<td style="text-align: right;">0.42</td>
+</tr>
+<tr>
+<td style="text-align: right;">110°</td>
+<td style="text-align: right;">66.20%</td>
+<td style="text-align: right;">59.68%</td>
+<td style="text-align: right;">58.60%</td>
+<td style="text-align: right;">1.08</td>
+</tr>
+<tr>
+<td style="text-align: right;">120°</td>
+<td style="text-align: right;">68.27%</td>
+<td style="text-align: right;">62.62%</td>
+<td style="text-align: right;">60.86%</td>
+<td style="text-align: right;">1.76</td>
+</tr>
+<tr>
+<td style="text-align: right;">130°</td>
+<td style="text-align: right;">70.49%</td>
+<td style="text-align: right;">65.75%</td>
+<td style="text-align: right;">63.67%</td>
+<td style="text-align: right;">2.08</td>
+</tr>
+<tr>
+<td style="text-align: right;">140°</td>
+<td style="text-align: right;">71.37%</td>
+<td style="text-align: right;">66.62%</td>
+<td style="text-align: right;">64.72%</td>
+<td style="text-align: right;">1.90</td>
+</tr>
+<tr>
+<td style="text-align: right;">150°</td>
+<td style="text-align: right;">70.39%</td>
+<td style="text-align: right;">64.95%</td>
+<td style="text-align: right;">63.14%</td>
+<td style="text-align: right;">1.80</td>
+</tr>
+<tr>
+<td style="text-align: right;">160°</td>
+<td style="text-align: right;">69.28%</td>
+<td style="text-align: right;">63.67%</td>
+<td style="text-align: right;">61.66%</td>
+<td style="text-align: right;">2.02</td>
+</tr>
+<tr>
+<td style="text-align: right;">170°</td>
+<td style="text-align: right;">68.74%</td>
+<td style="text-align: right;">63.95%</td>
+<td style="text-align: right;">61.24%</td>
+<td style="text-align: right;">2.71</td>
+</tr>
+<tr>
+<td style="text-align: right;">180°</td>
+<td style="text-align: right;">67.95%</td>
+<td style="text-align: right;">64.82%</td>
+<td style="text-align: right;">61.76%</td>
+<td style="text-align: right;">3.07</td>
+</tr>
+<tr>
+<td style="text-align: right;"><strong>逐方向均值</strong></td>
+<td style="text-align: right;"><strong>68.99%</strong></td>
+<td style="text-align: right;"><strong>63.60%</strong></td>
+<td style="text-align: right;"><strong>61.88%</strong></td>
+<td style="text-align: right;"><strong>1.72</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>addTrain 的电流误差在 <strong>19/19</strong> 个方向低于 V7comb。归一化修正量 MSE 的 19 方向均值：V7comb <strong>0.180036</strong>、addTrain <strong>0.170241</strong>；它与物理电流相对误差不是同一指标。同口径单站 RCS RMSE：PO <strong>8.30 dB</strong>、V7comb <strong>5.36 dB</strong>、addTrain <strong>6.89 dB</strong>。addTrain 的 RCS 单点绝对误差在 7/19 个方向低于 V7comb；整体 RMSE 需按平方差汇总，不能由方向胜出数决定。逐点数据与本地页面分别见 <code>visualization/f22_scaled_v7comb_generalization/summary.json</code>、<code>visualization/f22_scaled_addTrain_generalization/summary.json</code> 及各目录的 <code>index.html</code>。</p>
+<h4>TrihedralAngle</h4>
+<p>数据集：<code>caseOther/TrihedralAngle/dataset_TrihedralAngle.pt</code>，19,356 个三角元。下表每行是完整复电流相对 MoM 的误差；降低量为 V7comb 减 addTrain，单位为百分点。</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th style="text-align: right;">$\phi$</th>
+<th style="text-align: right;">PO error</th>
+<th style="text-align: right;">V7comb 预测 error</th>
+<th style="text-align: right;">addTrain 预测 error</th>
+<th style="text-align: right;">预测误差降低（百分点）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">0°</td>
+<td style="text-align: right;">75.96%</td>
+<td style="text-align: right;">40.14%</td>
+<td style="text-align: right;">35.87%</td>
+<td style="text-align: right;">4.28</td>
+</tr>
+<tr>
+<td style="text-align: right;">10°</td>
+<td style="text-align: right;">75.25%</td>
+<td style="text-align: right;">42.13%</td>
+<td style="text-align: right;">38.02%</td>
+<td style="text-align: right;">4.11</td>
+</tr>
+<tr>
+<td style="text-align: right;">20°</td>
+<td style="text-align: right;">76.24%</td>
+<td style="text-align: right;">45.65%</td>
+<td style="text-align: right;">39.20%</td>
+<td style="text-align: right;">6.44</td>
+</tr>
+<tr>
+<td style="text-align: right;">30°</td>
+<td style="text-align: right;">78.06%</td>
+<td style="text-align: right;">46.51%</td>
+<td style="text-align: right;">41.72%</td>
+<td style="text-align: right;">4.79</td>
+</tr>
+<tr>
+<td style="text-align: right;">40°</td>
+<td style="text-align: right;">78.52%</td>
+<td style="text-align: right;">45.11%</td>
+<td style="text-align: right;">41.56%</td>
+<td style="text-align: right;">3.55</td>
+</tr>
+<tr>
+<td style="text-align: right;">50°</td>
+<td style="text-align: right;">78.54%</td>
+<td style="text-align: right;">44.96%</td>
+<td style="text-align: right;">40.99%</td>
+<td style="text-align: right;">3.96</td>
+</tr>
+<tr>
+<td style="text-align: right;">60°</td>
+<td style="text-align: right;">78.01%</td>
+<td style="text-align: right;">46.60%</td>
+<td style="text-align: right;">40.38%</td>
+<td style="text-align: right;">6.22</td>
+</tr>
+<tr>
+<td style="text-align: right;">70°</td>
+<td style="text-align: right;">76.25%</td>
+<td style="text-align: right;">46.13%</td>
+<td style="text-align: right;">37.01%</td>
+<td style="text-align: right;">9.11</td>
+</tr>
+<tr>
+<td style="text-align: right;">80°</td>
+<td style="text-align: right;">75.24%</td>
+<td style="text-align: right;">41.65%</td>
+<td style="text-align: right;">35.06%</td>
+<td style="text-align: right;">6.58</td>
+</tr>
+<tr>
+<td style="text-align: right;">90°</td>
+<td style="text-align: right;">75.95%</td>
+<td style="text-align: right;">39.47%</td>
+<td style="text-align: right;">32.67%</td>
+<td style="text-align: right;">6.80</td>
+</tr>
+<tr>
+<td style="text-align: right;">100°</td>
+<td style="text-align: right;">73.71%</td>
+<td style="text-align: right;">39.18%</td>
+<td style="text-align: right;">32.47%</td>
+<td style="text-align: right;">6.71</td>
+</tr>
+<tr>
+<td style="text-align: right;">110°</td>
+<td style="text-align: right;">71.51%</td>
+<td style="text-align: right;">38.40%</td>
+<td style="text-align: right;">34.29%</td>
+<td style="text-align: right;">4.11</td>
+</tr>
+<tr>
+<td style="text-align: right;">120°</td>
+<td style="text-align: right;">68.85%</td>
+<td style="text-align: right;">37.08%</td>
+<td style="text-align: right;">34.80%</td>
+<td style="text-align: right;">2.29</td>
+</tr>
+<tr>
+<td style="text-align: right;">130°</td>
+<td style="text-align: right;">66.73%</td>
+<td style="text-align: right;">35.43%</td>
+<td style="text-align: right;">35.05%</td>
+<td style="text-align: right;">0.38</td>
+</tr>
+<tr>
+<td style="text-align: right;">140°</td>
+<td style="text-align: right;">64.68%</td>
+<td style="text-align: right;">36.41%</td>
+<td style="text-align: right;">36.49%</td>
+<td style="text-align: right;">-0.08</td>
+</tr>
+<tr>
+<td style="text-align: right;">150°</td>
+<td style="text-align: right;">62.78%</td>
+<td style="text-align: right;">35.95%</td>
+<td style="text-align: right;">36.30%</td>
+<td style="text-align: right;">-0.35</td>
+</tr>
+<tr>
+<td style="text-align: right;">160°</td>
+<td style="text-align: right;">59.86%</td>
+<td style="text-align: right;">34.90%</td>
+<td style="text-align: right;">33.21%</td>
+<td style="text-align: right;">1.69</td>
+</tr>
+<tr>
+<td style="text-align: right;">170°</td>
+<td style="text-align: right;">58.88%</td>
+<td style="text-align: right;">34.35%</td>
+<td style="text-align: right;">30.34%</td>
+<td style="text-align: right;">4.01</td>
+</tr>
+<tr>
+<td style="text-align: right;">180°</td>
+<td style="text-align: right;">59.03%</td>
+<td style="text-align: right;">32.57%</td>
+<td style="text-align: right;">29.49%</td>
+<td style="text-align: right;">3.08</td>
+</tr>
+<tr>
+<td style="text-align: right;"><strong>逐方向均值</strong></td>
+<td style="text-align: right;"><strong>71.27%</strong></td>
+<td style="text-align: right;"><strong>40.14%</strong></td>
+<td style="text-align: right;"><strong>36.05%</strong></td>
+<td style="text-align: right;"><strong>4.09</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>addTrain 的电流误差在 <strong>17/19</strong> 个方向低于 V7comb。归一化修正量 MSE 的 19 方向均值：V7comb <strong>0.066089</strong>、addTrain <strong>0.051978</strong>；它与物理电流相对误差不是同一指标。同口径单站 RCS RMSE：PO <strong>26.04 dB</strong>、V7comb <strong>7.53 dB</strong>、addTrain <strong>7.84 dB</strong>。addTrain 的 RCS 单点绝对误差在 12/19 个方向低于 V7comb；整体 RMSE 需按平方差汇总，不能由方向胜出数决定。逐点数据与本地页面分别见 <code>visualization/trihedralangle_v7comb_generalization/summary.json</code>、<code>visualization/trihedralangle_addTrain_generalization/summary.json</code> 及各目录的 <code>index.html</code>。</p>
+<h4>Rocket</h4>
+<p>数据集：<code>caseOther/Rocket/dataset_Rocket.pt</code>，40,506 个三角元。V7comb 在 φ=0°、10°、20° 的电流误差高于 PO，虽然 19 方向均值仍低于 PO。下表每行是完整复电流相对 MoM 的误差；降低量为 V7comb 减 addTrain，单位为百分点。</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th style="text-align: right;">$\phi$</th>
+<th style="text-align: right;">PO error</th>
+<th style="text-align: right;">V7comb 预测 error</th>
+<th style="text-align: right;">addTrain 预测 error</th>
+<th style="text-align: right;">预测误差降低（百分点）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">0°</td>
+<td style="text-align: right;">54.63%</td>
+<td style="text-align: right;">57.34%</td>
+<td style="text-align: right;">50.24%</td>
+<td style="text-align: right;">7.10</td>
+</tr>
+<tr>
+<td style="text-align: right;">10°</td>
+<td style="text-align: right;">54.05%</td>
+<td style="text-align: right;">56.73%</td>
+<td style="text-align: right;">49.02%</td>
+<td style="text-align: right;">7.71</td>
+</tr>
+<tr>
+<td style="text-align: right;">20°</td>
+<td style="text-align: right;">55.27%</td>
+<td style="text-align: right;">56.39%</td>
+<td style="text-align: right;">49.95%</td>
+<td style="text-align: right;">6.44</td>
+</tr>
+<tr>
+<td style="text-align: right;">30°</td>
+<td style="text-align: right;">57.56%</td>
+<td style="text-align: right;">55.98%</td>
+<td style="text-align: right;">49.74%</td>
+<td style="text-align: right;">6.24</td>
+</tr>
+<tr>
+<td style="text-align: right;">40°</td>
+<td style="text-align: right;">59.28%</td>
+<td style="text-align: right;">55.82%</td>
+<td style="text-align: right;">50.08%</td>
+<td style="text-align: right;">5.74</td>
+</tr>
+<tr>
+<td style="text-align: right;">50°</td>
+<td style="text-align: right;">60.23%</td>
+<td style="text-align: right;">54.28%</td>
+<td style="text-align: right;">49.59%</td>
+<td style="text-align: right;">4.69</td>
+</tr>
+<tr>
+<td style="text-align: right;">60°</td>
+<td style="text-align: right;">61.87%</td>
+<td style="text-align: right;">53.52%</td>
+<td style="text-align: right;">49.99%</td>
+<td style="text-align: right;">3.53</td>
+</tr>
+<tr>
+<td style="text-align: right;">70°</td>
+<td style="text-align: right;">63.13%</td>
+<td style="text-align: right;">53.64%</td>
+<td style="text-align: right;">49.62%</td>
+<td style="text-align: right;">4.02</td>
+</tr>
+<tr>
+<td style="text-align: right;">80°</td>
+<td style="text-align: right;">64.78%</td>
+<td style="text-align: right;">53.91%</td>
+<td style="text-align: right;">49.53%</td>
+<td style="text-align: right;">4.37</td>
+</tr>
+<tr>
+<td style="text-align: right;">90°</td>
+<td style="text-align: right;">65.78%</td>
+<td style="text-align: right;">53.96%</td>
+<td style="text-align: right;">48.11%</td>
+<td style="text-align: right;">5.85</td>
+</tr>
+<tr>
+<td style="text-align: right;">100°</td>
+<td style="text-align: right;">65.74%</td>
+<td style="text-align: right;">54.05%</td>
+<td style="text-align: right;">49.75%</td>
+<td style="text-align: right;">4.30</td>
+</tr>
+<tr>
+<td style="text-align: right;">110°</td>
+<td style="text-align: right;">65.59%</td>
+<td style="text-align: right;">54.46%</td>
+<td style="text-align: right;">51.54%</td>
+<td style="text-align: right;">2.92</td>
+</tr>
+<tr>
+<td style="text-align: right;">120°</td>
+<td style="text-align: right;">63.61%</td>
+<td style="text-align: right;">54.49%</td>
+<td style="text-align: right;">51.51%</td>
+<td style="text-align: right;">2.98</td>
+</tr>
+<tr>
+<td style="text-align: right;">130°</td>
+<td style="text-align: right;">61.58%</td>
+<td style="text-align: right;">53.83%</td>
+<td style="text-align: right;">50.96%</td>
+<td style="text-align: right;">2.87</td>
+</tr>
+<tr>
+<td style="text-align: right;">140°</td>
+<td style="text-align: right;">59.42%</td>
+<td style="text-align: right;">52.45%</td>
+<td style="text-align: right;">48.89%</td>
+<td style="text-align: right;">3.57</td>
+</tr>
+<tr>
+<td style="text-align: right;">150°</td>
+<td style="text-align: right;">58.80%</td>
+<td style="text-align: right;">51.94%</td>
+<td style="text-align: right;">48.83%</td>
+<td style="text-align: right;">3.11</td>
+</tr>
+<tr>
+<td style="text-align: right;">160°</td>
+<td style="text-align: right;">57.35%</td>
+<td style="text-align: right;">52.59%</td>
+<td style="text-align: right;">49.31%</td>
+<td style="text-align: right;">3.28</td>
+</tr>
+<tr>
+<td style="text-align: right;">170°</td>
+<td style="text-align: right;">56.21%</td>
+<td style="text-align: right;">52.58%</td>
+<td style="text-align: right;">49.24%</td>
+<td style="text-align: right;">3.35</td>
+</tr>
+<tr>
+<td style="text-align: right;">180°</td>
+<td style="text-align: right;">56.35%</td>
+<td style="text-align: right;">51.96%</td>
+<td style="text-align: right;">48.66%</td>
+<td style="text-align: right;">3.30</td>
+</tr>
+<tr>
+<td style="text-align: right;"><strong>逐方向均值</strong></td>
+<td style="text-align: right;"><strong>60.06%</strong></td>
+<td style="text-align: right;"><strong>54.21%</strong></td>
+<td style="text-align: right;"><strong>49.71%</strong></td>
+<td style="text-align: right;"><strong>4.49</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>addTrain 的电流误差在 <strong>19/19</strong> 个方向低于 V7comb。归一化修正量 MSE 的 19 方向均值：V7comb <strong>0.080119</strong>、addTrain <strong>0.067692</strong>；它与物理电流相对误差不是同一指标。同口径单站 RCS RMSE：PO <strong>8.81 dB</strong>、V7comb <strong>6.81 dB</strong>、addTrain <strong>4.98 dB</strong>。addTrain 的 RCS 单点绝对误差在 13/19 个方向低于 V7comb；整体 RMSE 需按平方差汇总，不能由方向胜出数决定。逐点数据与本地页面分别见 <code>visualization/rocket_v7comb_generalization/summary.json</code>、<code>visualization/rocket_addTrain_generalization/summary.json</code> 及各目录的 <code>index.html</code>。</p>
+<h3>较坏结果</h3>
+<h4>SatelliteCylinder</h4>
+<p>数据集：<code>caseOther/SatelliteCylinder/dataset_SatelliteCylinder.pt</code>，51,390 个三角元。下表每行是完整复电流相对 MoM 的误差；降低量为 V7comb 减 addTrain，单位为百分点。</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th style="text-align: right;">$\phi$</th>
+<th style="text-align: right;">PO error</th>
+<th style="text-align: right;">V7comb 预测 error</th>
+<th style="text-align: right;">addTrain 预测 error</th>
+<th style="text-align: right;">预测误差降低（百分点）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">0°</td>
+<td style="text-align: right;">59.77%</td>
+<td style="text-align: right;">58.70%</td>
+<td style="text-align: right;">43.67%</td>
+<td style="text-align: right;">15.02</td>
+</tr>
+<tr>
+<td style="text-align: right;">10°</td>
+<td style="text-align: right;">59.16%</td>
+<td style="text-align: right;">58.68%</td>
+<td style="text-align: right;">43.31%</td>
+<td style="text-align: right;">15.37</td>
+</tr>
+<tr>
+<td style="text-align: right;">20°</td>
+<td style="text-align: right;">58.19%</td>
+<td style="text-align: right;">58.17%</td>
+<td style="text-align: right;">43.96%</td>
+<td style="text-align: right;">14.21</td>
+</tr>
+<tr>
+<td style="text-align: right;">30°</td>
+<td style="text-align: right;">56.48%</td>
+<td style="text-align: right;">57.49%</td>
+<td style="text-align: right;">43.68%</td>
+<td style="text-align: right;">13.81</td>
+</tr>
+<tr>
+<td style="text-align: right;">40°</td>
+<td style="text-align: right;">54.85%</td>
+<td style="text-align: right;">56.46%</td>
+<td style="text-align: right;">43.47%</td>
+<td style="text-align: right;">13.00</td>
+</tr>
+<tr>
+<td style="text-align: right;">50°</td>
+<td style="text-align: right;">54.80%</td>
+<td style="text-align: right;">57.47%</td>
+<td style="text-align: right;">45.91%</td>
+<td style="text-align: right;">11.56</td>
+</tr>
+<tr>
+<td style="text-align: right;">60°</td>
+<td style="text-align: right;">53.19%</td>
+<td style="text-align: right;">55.49%</td>
+<td style="text-align: right;">45.22%</td>
+<td style="text-align: right;">10.26</td>
+</tr>
+<tr>
+<td style="text-align: right;">70°</td>
+<td style="text-align: right;">52.30%</td>
+<td style="text-align: right;">54.33%</td>
+<td style="text-align: right;">45.18%</td>
+<td style="text-align: right;">9.15</td>
+</tr>
+<tr>
+<td style="text-align: right;">80°</td>
+<td style="text-align: right;">51.53%</td>
+<td style="text-align: right;">53.29%</td>
+<td style="text-align: right;">44.30%</td>
+<td style="text-align: right;">8.98</td>
+</tr>
+<tr>
+<td style="text-align: right;">90°</td>
+<td style="text-align: right;">51.19%</td>
+<td style="text-align: right;">52.34%</td>
+<td style="text-align: right;">44.65%</td>
+<td style="text-align: right;">7.68</td>
+</tr>
+<tr>
+<td style="text-align: right;">100°</td>
+<td style="text-align: right;">51.56%</td>
+<td style="text-align: right;">51.98%</td>
+<td style="text-align: right;">43.73%</td>
+<td style="text-align: right;">8.26</td>
+</tr>
+<tr>
+<td style="text-align: right;">110°</td>
+<td style="text-align: right;">52.38%</td>
+<td style="text-align: right;">53.04%</td>
+<td style="text-align: right;">44.45%</td>
+<td style="text-align: right;">8.59</td>
+</tr>
+<tr>
+<td style="text-align: right;">120°</td>
+<td style="text-align: right;">53.24%</td>
+<td style="text-align: right;">53.98%</td>
+<td style="text-align: right;">45.14%</td>
+<td style="text-align: right;">8.84</td>
+</tr>
+<tr>
+<td style="text-align: right;">130°</td>
+<td style="text-align: right;">54.85%</td>
+<td style="text-align: right;">55.21%</td>
+<td style="text-align: right;">45.52%</td>
+<td style="text-align: right;">9.70</td>
+</tr>
+<tr>
+<td style="text-align: right;">140°</td>
+<td style="text-align: right;">54.89%</td>
+<td style="text-align: right;">55.27%</td>
+<td style="text-align: right;">43.82%</td>
+<td style="text-align: right;">11.45</td>
+</tr>
+<tr>
+<td style="text-align: right;">150°</td>
+<td style="text-align: right;">56.42%</td>
+<td style="text-align: right;">56.66%</td>
+<td style="text-align: right;">43.40%</td>
+<td style="text-align: right;">13.26</td>
+</tr>
+<tr>
+<td style="text-align: right;">160°</td>
+<td style="text-align: right;">58.18%</td>
+<td style="text-align: right;">58.18%</td>
+<td style="text-align: right;">44.07%</td>
+<td style="text-align: right;">14.12</td>
+</tr>
+<tr>
+<td style="text-align: right;">170°</td>
+<td style="text-align: right;">59.10%</td>
+<td style="text-align: right;">59.32%</td>
+<td style="text-align: right;">43.22%</td>
+<td style="text-align: right;">16.10</td>
+</tr>
+<tr>
+<td style="text-align: right;">180°</td>
+<td style="text-align: right;">59.73%</td>
+<td style="text-align: right;">60.10%</td>
+<td style="text-align: right;">44.04%</td>
+<td style="text-align: right;">16.06</td>
+</tr>
+<tr>
+<td style="text-align: right;"><strong>逐方向均值</strong></td>
+<td style="text-align: right;"><strong>55.36%</strong></td>
+<td style="text-align: right;"><strong>56.11%</strong></td>
+<td style="text-align: right;"><strong>44.25%</strong></td>
+<td style="text-align: right;"><strong>11.86</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>原始几何曾有 Cuboid/Cylinder 重叠警告；用户修复后重新生成的 <code>SatelliteCylinder.cfm</code> 不再有该警告，面标签属于 Union1，数据集及本次评估均使用修复后的网格。V7comb 平均电流误差比 PO <strong>高 0.76 个百分点</strong>，并在 φ=30°～180° 的 <strong>16/19</strong> 个方向高于 PO；但它的 RCS RMSE 仍低于 PO。addTrain 同时改善了这两项总体指标。 addTrain 的电流误差在 <strong>19/19</strong> 个方向低于 V7comb。归一化修正量 MSE 均值：V7comb <strong>0.111009</strong>、addTrain <strong>0.069080</strong>。单站 RCS RMSE：PO <strong>11.72 dB</strong>、V7comb <strong>6.14 dB</strong>、addTrain <strong>4.41 dB</strong>。RCS 单点绝对误差中 addTrain 比 V7comb 低 14/19 个方向；RMSE 按所有方向的平方差计算。逐点数据及本地页面见 <code>visualization/satellitecylinder_v7comb_generalization/summary.json</code>、<code>visualization/satellitecylinder_addTrain_generalization/summary.json</code> 和各目录的 <code>index.html</code>。</p>
+<h4>SatelliteSphere</h4>
+<p>数据集：<code>caseOther/SatelliteSphere/dataset_SatelliteSphere.pt</code>，89,502 个三角元。下表每行是完整复电流相对 MoM 的误差；降低量为 V7comb 减 addTrain，单位为百分点。</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th style="text-align: right;">$\phi$</th>
+<th style="text-align: right;">PO error</th>
+<th style="text-align: right;">V7comb 预测 error</th>
+<th style="text-align: right;">addTrain 预测 error</th>
+<th style="text-align: right;">预测误差降低（百分点）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">0°</td>
+<td style="text-align: right;">54.68%</td>
+<td style="text-align: right;">58.15%</td>
+<td style="text-align: right;">51.75%</td>
+<td style="text-align: right;">6.40</td>
+</tr>
+<tr>
+<td style="text-align: right;">10°</td>
+<td style="text-align: right;">54.20%</td>
+<td style="text-align: right;">57.77%</td>
+<td style="text-align: right;">50.70%</td>
+<td style="text-align: right;">7.08</td>
+</tr>
+<tr>
+<td style="text-align: right;">20°</td>
+<td style="text-align: right;">52.81%</td>
+<td style="text-align: right;">56.49%</td>
+<td style="text-align: right;">48.97%</td>
+<td style="text-align: right;">7.52</td>
+</tr>
+<tr>
+<td style="text-align: right;">30°</td>
+<td style="text-align: right;">51.32%</td>
+<td style="text-align: right;">55.46%</td>
+<td style="text-align: right;">47.73%</td>
+<td style="text-align: right;">7.73</td>
+</tr>
+<tr>
+<td style="text-align: right;">40°</td>
+<td style="text-align: right;">50.71%</td>
+<td style="text-align: right;">55.13%</td>
+<td style="text-align: right;">47.18%</td>
+<td style="text-align: right;">7.95</td>
+</tr>
+<tr>
+<td style="text-align: right;">50°</td>
+<td style="text-align: right;">50.80%</td>
+<td style="text-align: right;">55.86%</td>
+<td style="text-align: right;">47.17%</td>
+<td style="text-align: right;">8.70</td>
+</tr>
+<tr>
+<td style="text-align: right;">60°</td>
+<td style="text-align: right;">51.36%</td>
+<td style="text-align: right;">56.89%</td>
+<td style="text-align: right;">47.85%</td>
+<td style="text-align: right;">9.04</td>
+</tr>
+<tr>
+<td style="text-align: right;">70°</td>
+<td style="text-align: right;">52.81%</td>
+<td style="text-align: right;">58.24%</td>
+<td style="text-align: right;">49.12%</td>
+<td style="text-align: right;">9.13</td>
+</tr>
+<tr>
+<td style="text-align: right;">80°</td>
+<td style="text-align: right;">54.21%</td>
+<td style="text-align: right;">59.57%</td>
+<td style="text-align: right;">51.06%</td>
+<td style="text-align: right;">8.51</td>
+</tr>
+<tr>
+<td style="text-align: right;">90°</td>
+<td style="text-align: right;">54.52%</td>
+<td style="text-align: right;">59.98%</td>
+<td style="text-align: right;">51.41%</td>
+<td style="text-align: right;">8.57</td>
+</tr>
+<tr>
+<td style="text-align: right;">100°</td>
+<td style="text-align: right;">54.24%</td>
+<td style="text-align: right;">59.40%</td>
+<td style="text-align: right;">51.43%</td>
+<td style="text-align: right;">7.98</td>
+</tr>
+<tr>
+<td style="text-align: right;">110°</td>
+<td style="text-align: right;">52.88%</td>
+<td style="text-align: right;">57.63%</td>
+<td style="text-align: right;">49.29%</td>
+<td style="text-align: right;">8.34</td>
+</tr>
+<tr>
+<td style="text-align: right;">120°</td>
+<td style="text-align: right;">51.34%</td>
+<td style="text-align: right;">56.09%</td>
+<td style="text-align: right;">48.15%</td>
+<td style="text-align: right;">7.95</td>
+</tr>
+<tr>
+<td style="text-align: right;">130°</td>
+<td style="text-align: right;">50.76%</td>
+<td style="text-align: right;">55.30%</td>
+<td style="text-align: right;">47.41%</td>
+<td style="text-align: right;">7.89</td>
+</tr>
+<tr>
+<td style="text-align: right;">140°</td>
+<td style="text-align: right;">50.79%</td>
+<td style="text-align: right;">55.51%</td>
+<td style="text-align: right;">47.60%</td>
+<td style="text-align: right;">7.90</td>
+</tr>
+<tr>
+<td style="text-align: right;">150°</td>
+<td style="text-align: right;">51.41%</td>
+<td style="text-align: right;">55.98%</td>
+<td style="text-align: right;">48.72%</td>
+<td style="text-align: right;">7.26</td>
+</tr>
+<tr>
+<td style="text-align: right;">160°</td>
+<td style="text-align: right;">52.82%</td>
+<td style="text-align: right;">57.07%</td>
+<td style="text-align: right;">49.49%</td>
+<td style="text-align: right;">7.57</td>
+</tr>
+<tr>
+<td style="text-align: right;">170°</td>
+<td style="text-align: right;">54.23%</td>
+<td style="text-align: right;">58.81%</td>
+<td style="text-align: right;">50.57%</td>
+<td style="text-align: right;">8.24</td>
+</tr>
+<tr>
+<td style="text-align: right;">180°</td>
+<td style="text-align: right;">54.63%</td>
+<td style="text-align: right;">59.04%</td>
+<td style="text-align: right;">51.22%</td>
+<td style="text-align: right;">7.82</td>
+</tr>
+<tr>
+<td style="text-align: right;"><strong>逐方向均值</strong></td>
+<td style="text-align: right;"><strong>52.66%</strong></td>
+<td style="text-align: right;"><strong>57.28%</strong></td>
+<td style="text-align: right;"><strong>49.31%</strong></td>
+<td style="text-align: right;"><strong>7.98</strong></td>
+</tr>
+</tbody>
+</table></div>
+<p>V7comb 的平均电流误差比 PO <strong>高 4.62 个百分点</strong>，19/19 个方向都高于 PO；其 RCS RMSE 也高于 PO。addTrain 在 19/19 个方向降低电流误差，但 RCS RMSE <strong>3.41 dB</strong> 仍高于 PO 的 <strong>2.42 dB</strong>。目标结构中可供耦合修正的部分较少是一种可能解释，尚未通过结构量化或消融验证，不能作为确定原因。 addTrain 的电流误差在 <strong>19/19</strong> 个方向低于 V7comb。归一化修正量 MSE 均值：V7comb <strong>0.094490</strong>、addTrain <strong>0.070036</strong>。单站 RCS RMSE：PO <strong>2.42 dB</strong>、V7comb <strong>4.75 dB</strong>、addTrain <strong>3.41 dB</strong>。RCS 单点绝对误差中 addTrain 比 V7comb 低 11/19 个方向；RMSE 按所有方向的平方差计算。逐点数据及本地页面见 <code>visualization/satellitesphere_v7comb_generalization/summary.json</code>、<code>visualization/satellitesphere_addTrain_generalization/summary.json</code> 和各目录的 <code>index.html</code>。</p>
+<h2 id="record-section-8">Loss 曲线</h2>
 <h3>序号7</h3>
 <p>
 <img alt="序号7 Case 1 loss曲线" src="assets/loss_curves/experiment_7_case1.png" width="32%"/>
